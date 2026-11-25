@@ -12,7 +12,7 @@
   "scripts": {
     "start": "node bin/wf.js serve examples/expense-approvals",
     "library": "node bin/wf.js library",
-    "test": "node --test test/"
+    "test": "node --test test/*.test.js"
   },
   "license": "MIT"
 }
