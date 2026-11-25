@@ -23,14 +23,17 @@ Read the arguments after `/wireframe`:
 | Arguments | Do |
 |---|---|
 | `setup`, `doctor`, or something is broken | **Setup** |
-| a description of something to build | **New prototype** |
+| a description of something to build, inside a code repository that is not itself a prototype | **Existing project** (section 3b), then **New prototype** |
+| a description of something to build, anywhere else | **New prototype** |
 | nothing, or a change request, inside a prototype folder (has `seed/users.json`) | **Iterate** |
 | `users` / "who are the test users" | **Revise users** |
 | `inbox` / "check comments" | **Handle comments** |
 | `spec` / "write the spec" / "hand this over" | **Hand over** (section 7) |
-| `open <name>` / "show me <name>" | Run it (step 3.8) from `~/Wireframes/<name>` |
+| `open <name>` / "show me <name>" | Find it with `wf list --json` (this repository first, then `~/Wireframes`) and run it (step 3.8) |
 
-If there are no arguments and you are not inside a prototype, list `~/Wireframes/*` and ask which to open, or what to build.
+If there are no arguments and you are not inside a prototype, run `wf list`. Inside a code repository with exactly one prototype, resume it. Otherwise show the list and ask which to open, or what to build.
+
+A code repository means the nearest folder above with `.git`, holding app code. `wf` commands run from anywhere in it find its prototype by themselves when there is only one.
 
 ## 2. Setup (non-technical friendly)
 
@@ -47,7 +50,7 @@ If there are no arguments and you are not inside a prototype, list `~/Wireframes
 
 1. **Understand the brief.** If it is really ambiguous (you can't tell who uses it or what the main job is), ask **one** round of at most 3 short questions. Otherwise decide, and list your assumptions in WIREFRAME.md and in your reply.
 2. **Read the references before writing any screen**, once per session: `KIT/skills/wireframe/reference/STYLE.md`, `COMPONENTS.md`, `PATTERNS.md`, `PERSONAS.md`.
-3. **Create:** `wf new "<short name>" --json`. Work inside the folder it prints, at `~/Wireframes/<slug>`.
+3. **Create:** `wf new "<short name>" --json`, or with `--dir <folder>` when 3b chose one. Work inside the folder it prints (by default `~/Wireframes/<slug>`).
 4. **Plan in WIREFRAME.md:** brief, assumptions, 4–8 screens for v1 (one HTML file each), the data model (collections and fields), seeded users and why each exists, and open questions. Keep v1 small and end to end. One flow that works beats ten dead screens.
 5. **Seed users and data** per PERSONAS.md. If roles act on the same records (approvals, hand-offs), use a shared world. If the brief is a new app embedded in an existing one, follow “Embedded apps” in PATTERNS.md. `seed/users.json` plus one `seed/<id>.json` per user (and `seed/shared.json` for data everyone sees). Make the data realistic, internally consistent, and specific to the domain. Each user's `stats` must match their seed.
 6. **Build screens** in `screens/`, following PATTERNS.md:
@@ -65,6 +68,26 @@ If there are no arguments and you are not inside a prototype, list `~/Wireframes
    - your assumptions;
    - the seeded users and what each shows;
    - how to iterate: "Press **U** to switch user, **C** to comment on anything. Tick *Send to coding agent* and I'll pick it up. Or just tell me here."
+
+## 3b. Existing project
+
+The brief is a change to an app whose code is here. The code is the source of truth for what already exists: read it so the wireframe shows the real app, not an invented one. You still build a plain wf prototype; you never change the app's code.
+
+1. **Where it lives.** If `wf list --json` shows prototypes in this repository, use their folder. Otherwise ask one question: keep it in the repository at `wireframes/<slug>/`, versioned with the code (default), or in `~/Wireframes`. `wf new` writes `.wireframe/.gitignore`, so only the prototype and its comment threads get committed. Don't commit unless asked.
+2. **Read the app before planning.** Skim, don't read everything. For a large repository, hand this to an Explore agent and ask for the summary below. Look for:
+   - stack and conventions: README, CLAUDE.md, the package manifest;
+   - navigation and pages: router or routes file, layout and nav components, page folders. Note the real menu labels and page titles;
+   - the data model the feature touches: schema, migrations, models or types, with real entity and field names;
+   - roles, permissions, plans and feature flags: policies, auth middleware, entitlement checks;
+   - real copy and terminology: i18n files, existing empty states and error messages;
+   - spec tool traces for the hand-over: `.specify/`, `openspec/`, a spec template, or a spec folder.
+3. **Create** with `wf new "<short name>" --dir "<repo>/wireframes" --json` (or the chosen folder).
+4. **Add a "Host app" section to WIREFRAME.md**, before Assumptions: the repository path relative to the prototype (e.g. `../..`), the stack in one line, the existing screens the feature lives in, the entities and fields it uses, the roles and plans, and the source file for each fact (`app/models/invoice.rb`). Anything you couldn't confirm in code goes under Assumptions.
+5. **Then follow section 3 from step 4**, with these differences:
+   - **Host screens.** Draw the existing pages the feature touches in LoFi, using the real nav labels, page titles and layout. Draw only those, and keep them working enough to reach the new part. Leave out pages the feature doesn't touch.
+   - **New vs existing.** Make the new part obvious: a `wf-badge` "New" on new nav items and sections, or a `wf-note` on a changed area. If the new part is an app embedded in an iframe, use "Embedded apps" in PATTERNS.md.
+   - **Data model.** Use the real entity and field names in the seed and in WIREFRAME.md. Mark each new collection or field as **new**, so the hand-over can tell new schema from existing.
+   - **Users.** Base the cast on the real roles, plans and flags. Each user's `why` names the real role or condition it shows (e.g. "role `approver` without `export` permission").
 
 ## 4. Iterate (prompts in the terminal)
 
@@ -102,10 +125,11 @@ The agreed wireframe is the input for the next step; the person decides the form
 1. Ask, in one question, how they want the spec unless they already said or the project shows it:
    - a plain Markdown document (default if they don't care);
    - a spec tool they use, such as Spec Kit, OpenSpec or a team template. Look for its traces first (for example a `.specify/` or `openspec/` folder, a template file, or a project CLAUDE.md that names one) and follow that tool's own commands and structure; don't recreate it by hand.
+   If WIREFRAME.md has a Host app section, look for those traces at the repository root, not only in the prototype folder, and save the spec where that tool or the repository keeps specs.
 2. Sources, in this order: WIREFRAME.md (brief, assumptions, decisions, data model, users, open questions, changelog), the screens and their behaviour, the seed data (realistic examples and edge cases), and resolved comment threads (decisions and their reasons).
-3. Cover what the wireframe proves: user roles and permissions, flows step by step, states (empty, error, loading, limits), the data model, validation rules and the open questions still to settle. Link each requirement to the screen that shows it.
+3. Cover what the wireframe proves: user roles and permissions, flows step by step, states (empty, error, loading, limits), the data model, validation rules and the open questions still to settle. Link each requirement to the screen that shows it. For an existing project, also name the code each requirement touches (from Host app) and split the data model into existing and new.
 4. Don't invent visual design. If they want HiFi screens, the agreed wireframe and its users are the brief.
-5. Save the spec where they ask; if they don't say, `spec/` inside the prototype folder. Note it in the WIREFRAME.md changelog.
+5. Save the spec where they ask; if they don't say, where the repository keeps specs, else `spec/` inside the prototype folder. Note it in the WIREFRAME.md changelog.
 
 ## Rules
 
@@ -113,4 +137,5 @@ The agreed wireframe is the input for the next step; the person decides the form
 - **No build tools or frameworks.** Use plain HTML and small inline `<script type="module">` blocks. Do not add npm packages or CDNs.
 - **Working, not pictures.** Buttons do something, forms save to the store, and lists react. Use `wf.toast` and modals for outcomes.
 - **Never edit** `.wireframe/comments.json` or files in `KIT`. Use `wf reply`.
+- **Never change the host app's code** in an existing project. Everything you write stays inside the prototype folder (and the spec, at hand-over).
 - **Plain language** with the person. Name screens and users, not files and selectors, unless they ask.

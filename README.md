@@ -40,6 +40,7 @@ Already have Node 18+? `node bin/wf.js setup` does the same from a shell.
 ## Using it
 
 - `/wireframe <brief>`: new prototype in `~/Wireframes/<name>`, opened in the browser.
+- `/wireframe <brief>` inside a code repository: Claude reads the app first (pages, nav, data model, roles, copy), then wireframes the change on top of the real app. The prototype lives in the repository, in `wireframes/<name>/` by default, with its runtime files gitignored. The hand-over spec names the code each requirement touches.
 - Talk to Claude to change it, or comment in the browser: press **C**, click anything, write, and tick *Send to coding agent*.
 - Press **U** to switch seeded users. Each one shows a different state: empty, power user, each role, each plan, edge cases. Claude revises the cast as the prototype grows.
 - `/wireframe` inside a prototype folder resumes it. `/wireframe open <name>` opens an older one.
@@ -57,7 +58,7 @@ If no session is listening, sent comments wait in `.wireframe/inbox/`. After 20 
 
 ## `wf` commands
 ```
-wf setup | doctor | new <name> | serve [dir] [--open] | library
+wf setup | doctor | new <name> [--dir d] | list | serve [dir] [--open] | library
 wf watch [--once] | inbox | reply <id> "<text>" [--resolve] | lint | snapshot [label]
 wf users | status | docs [style|components|patterns|personas]
 ```

@@ -83,3 +83,21 @@ test('shared world: every user gets the same shared data and a shared flag', () 
   assert.equal(a.version, b.version);
   assert.ok(!('ignored' in a.data));
 });
+
+test('prototypes inside a code repository: gitignored runtime, found from the repo root, listed', () => {
+  const repo = tmp();
+  fs.mkdirSync(path.join(repo, '.git'));
+  fs.mkdirSync(path.join(repo, 'node_modules', 'x', 'seed'), { recursive: true });
+  fs.writeFileSync(path.join(repo, 'node_modules', 'x', 'seed', 'users.json'), '{}');
+  execFileSync(process.execPath, [WF, 'new', 'billing', '--dir', path.join(repo, 'wireframes')], { stdio: 'pipe' });
+  const root = path.join(repo, 'wireframes', 'billing');
+  assert.match(fs.readFileSync(path.join(root, '.wireframe', '.gitignore'), 'utf8'), /server\.json/);
+  const run = (...a) => execFileSync(process.execPath, [WF, ...a], { cwd: repo, encoding: 'utf8' });
+  assert.match(run('status'), new RegExp(`Prototype: billing`));
+  assert.match(run('status', 'billing'), /Prototype: billing/);
+  const list = JSON.parse(run('list', '--json'));
+  const local = list.prototypes.filter((p) => p.where === 'repo');
+  assert.deepEqual(local.map((p) => p.name), ['billing']);
+  execFileSync(process.execPath, [WF, 'new', 'onboarding', '--dir', path.join(repo, 'wireframes')], { stdio: 'pipe' });
+  assert.throws(() => run('status'), /several prototypes/);
+});

@@ -4,6 +4,7 @@ import os from 'node:os';
 import {
   KIT_ROOT, DEFAULT_HOME, paths, findProject, requireProject, loadUsers, loadComments, updateComment,
   pending, formatForAgent, runningServer, viaServer, readJSON, isProject,
+  findRepo, findProjectsBelow, META_GITIGNORE,
 } from './project.js';
 import { serve, which, openBrowser } from './server.js';
 import { lint } from './lint.js';
@@ -13,7 +14,8 @@ const HELP = `wf — agentic LoFi wireframing helper
 Start
   wf setup                 Get this computer ready (folder, wf command, checks)
   wf doctor [--json]       Check everything and explain any problem
-  wf new <name>            Create a prototype in ~/Wireframes/<name>
+  wf new <name> [--dir d]  Create a prototype in ~/Wireframes/<name> (or d/<name>, e.g. a repo's wireframes/)
+  wf list [--json]         Prototypes in ~/Wireframes and in the current code repository
   wf serve [dir] [--open]  Run a prototype with live reload and comments
   wf library [--open]      Browse every wireframe component
 
@@ -38,6 +40,7 @@ export async function main(argv) {
     case 'help': case '--help': case '-h': return console.log(HELP);
     case 'version': case '--version': return console.log(readJSON(path.join(KIT_ROOT, 'package.json')).version);
     case 'new': return cmdNew(args[0], flags);
+    case 'list': case 'ls': return cmdList(flags);
     case 'serve': case 'open': case 'start': return cmdServe(args[0], flags);
     case 'library': return serve({ root: null, port: Number(flags.port) || 4320, open: !!flags.open, library: true });
     case 'watch': return cmdWatch(args[0], flags);
@@ -79,6 +82,7 @@ function cmdNew(name, flags) {
   const title = flags.title || name.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   copyTemplate(path.join(KIT_ROOT, 'templates', 'project'), dir, { NAME: title, SLUG: slug(name), DATE: new Date().toISOString().slice(0, 10) });
   fs.mkdirSync(path.join(dir, '.wireframe', 'inbox'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.wireframe', '.gitignore'), META_GITIGNORE);
   console.log(`Created ${dir}\nNext: wf serve "${dir}" --open`);
   if (flags.json) console.log(JSON.stringify({ dir }));
 }
@@ -107,14 +111,48 @@ async function cmdServe(dir, flags) {
 }
 
 function resolveProject(dir) {
+  const repo = findRepo(process.cwd());
+  const inRepo = () => (repo && path.resolve(repo) !== os.homedir() ? findProjectsBelow(repo) : []);
   if (dir) {
     const direct = path.resolve(dir);
     if (fs.existsSync(direct)) return requireProject(direct);
     const inHome = path.join(DEFAULT_HOME, dir);
     if (fs.existsSync(inHome)) return requireProject(inHome);
-    throw new Error(`no prototype at ${direct} or ${inHome}`);
+    const byName = inRepo().filter((p) => path.basename(p) === slug(dir));
+    if (byName.length === 1) return byName[0];
+    throw new Error(`no prototype at ${direct} or ${inHome}${repo ? ` or named "${slug(dir)}" in ${repo}` : ''}`);
+  }
+  const up = findProject(process.cwd());
+  if (up) return up;
+  // In a code repository: use its prototype when there is exactly one below here.
+  const below = repo && path.resolve(repo) !== os.homedir() ? findProjectsBelow(process.cwd()) : [];
+  if (below.length === 1) return below[0];
+  if (below.length > 1) {
+    throw new Error(`several prototypes here; name one:\n${below.map((p) => '  ' + path.relative(process.cwd(), p)).join('\n')}`);
   }
   return requireProject(process.cwd());
+}
+
+// ---- list ----
+function cmdList(flags) {
+  const home = fs.existsSync(DEFAULT_HOME)
+    ? fs.readdirSync(DEFAULT_HOME, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => path.join(DEFAULT_HOME, e.name)).filter(isProject).sort()
+    : [];
+  const repo = findRepo(process.cwd());
+  const local = repo && path.resolve(repo) !== os.homedir() ? findProjectsBelow(repo) : [];
+  const row = (root, where) => ({ name: path.basename(root), dir: root, where, running: !!runningServer(root) });
+  const all = [...local.map((r) => row(r, 'repo')), ...home.filter((h) => !local.includes(h)).map((r) => row(r, 'home'))];
+  if (flags.json) return console.log(JSON.stringify({ repo, prototypes: all }, null, 2));
+  if (!all.length) return console.log('No prototypes yet. Create one with: wf new <name>');
+  if (local.length) {
+    console.log(`In this repository (${repo}):`);
+    for (const p of all.filter((p) => p.where === 'repo')) console.log(`  ${p.name.padEnd(28)} ${path.relative(process.cwd(), p.dir) || '.'}${p.running ? '  (running)' : ''}`);
+  }
+  const h = all.filter((p) => p.where === 'home');
+  if (h.length) {
+    console.log(`In ${DEFAULT_HOME}:`);
+    for (const p of h) console.log(`  ${p.name}${p.running ? '  (running)' : ''}`);
+  }
 }
 
 // ---- agent loop ----

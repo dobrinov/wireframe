@@ -26,7 +26,51 @@ export function paths(root) {
 }
 
 export function isProject(dir) {
-  return fs.existsSync(path.join(dir, 'seed', 'users.json')) || fs.existsSync(path.join(dir, '.wireframe'));
+  if (fs.existsSync(path.join(dir, 'seed', 'users.json'))) return true;
+  // ~/.wireframe holds the private runtime, not a prototype.
+  return path.resolve(dir) !== os.homedir() && fs.existsSync(path.join(dir, '.wireframe', 'comments.json'));
+}
+
+// Runtime files that stay out of git when a prototype lives inside a code repository.
+export const META_GITIGNORE = `# Written by wf. Runtime files stay out of git;
+# comments.json (decisions and their reasons) and config.json are worth keeping.
+server.json
+inbox/
+history/
+headless.log
+*.tmp
+`;
+
+// Nearest folder above `start` (inclusive) that is a git repository, or null.
+export function findRepo(start = process.cwd()) {
+  let dir = path.resolve(start);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, '.git'))) return dir;
+    const up = path.dirname(dir);
+    if (up === dir) return null;
+    dir = up;
+  }
+}
+
+const SKIP_DIRS = new Set(['node_modules', 'vendor', 'dist', 'build', 'target', 'coverage', 'tmp', 'log', '_site']);
+
+// Prototypes inside `start`, breadth first, not descending into dot folders, dependencies or other prototypes.
+export function findProjectsBelow(start, { maxDepth = 5, limit = 200 } = {}) {
+  const found = [];
+  let level = [path.resolve(start)];
+  for (let depth = 0; depth <= maxDepth && level.length && found.length < limit; depth++) {
+    const next = [];
+    for (const dir of level) {
+      if (isProject(dir)) { found.push(dir); continue; }
+      let entries = [];
+      try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { continue; }
+      for (const e of entries) {
+        if (e.isDirectory() && !e.name.startsWith('.') && !SKIP_DIRS.has(e.name)) next.push(path.join(dir, e.name));
+      }
+    }
+    level = next;
+  }
+  return found.sort();
 }
 
 // Walk up from `start` to the nearest wireframe project.
