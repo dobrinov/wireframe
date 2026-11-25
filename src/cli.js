@@ -269,7 +269,7 @@ function checks() {
   const installed = readJSON(path.join(os.homedir(), '.claude', 'plugins', 'installed_plugins.json'), {});
   const hasPlugin = JSON.stringify(installed).includes('wireframe@') || fs.existsSync(path.join(os.homedir(), '.claude', 'skills', 'wireframe', 'SKILL.md'));
   add('plugin', hasPlugin, hasPlugin ? '/wireframe is installed in Claude Code' : '/wireframe is not installed in Claude Code yet',
-    `In Claude Code run: /plugin marketplace add ${KIT_ROOT}  then  /plugin install wireframe@wireframe-kit`);
+    `In Claude Code run: /plugin marketplace add ${KIT_ROOT}  then  /plugin install wireframe@wireframe`);
   const proj = findProject(process.cwd());
   if (proj) {
     const p = paths(proj);

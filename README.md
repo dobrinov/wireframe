@@ -1,4 +1,4 @@
-# Wireframe kit: agentic LoFi wireframing for Claude Code
+# Wireframe: agentic LoFi wireframing for Claude Code
 
 Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cast of seeded test users, then builds a **working** LoFi prototype from the `wf` component library and opens it in your browser. Iterate by prompting in Claude Code, or by clicking anything in the prototype and leaving a comment. Tick **Send to coding agent** and the comment reaches the running Claude Code session, along with the user you were signed in as.
 
@@ -26,7 +26,7 @@ Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cas
 1. In Claude Code:
    ```
    /plugin marketplace add dobrinov/wireframe
-   /plugin install wireframe@wireframe-kit
+   /plugin install wireframe@wireframe
    ```
    (Working on the kit itself? Use `/plugin marketplace add /path/to/this/folder` instead.)
 2. Type `/wireframe setup`. Claude checks the computer, installs what's missing (asking first), and creates `~/Wireframes`. Nobody needs to touch a terminal.

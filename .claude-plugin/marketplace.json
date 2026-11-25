@@ -1,5 +1,5 @@
 {
-  "name": "wireframe-kit",
+  "name": "wireframe",
   "description": "Agentic LoFi wireframing for Claude Code.",
   "owner": { "name": "Deyan Dobrinov" },
   "plugins": [

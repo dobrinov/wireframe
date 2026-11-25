@@ -1,5 +1,5 @@
 {
-  "name": "wireframe-kit",
+  "name": "wireframe",
   "version": "0.1.0",
   "description": "Agentic LoFi wireframing: /wireframe for Claude Code, a no-build wireframe component library, seeded users and on-UI comments that reach your coding agent.",
   "type": "module",
