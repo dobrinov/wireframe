@@ -1,4 +1,4 @@
-# Gets a Windows computer ready for /wireframe without needing anything pre-installed.
+# Gets a Windows computer ready for /sketch without needing anything pre-installed.
 # Uses Node.js 18+ if present; otherwise downloads a private copy into %USERPROFILE%\.wireframe\runtime.
 $ErrorActionPreference = 'Stop'
 $Kit = Split-Path -Parent $PSScriptRoot

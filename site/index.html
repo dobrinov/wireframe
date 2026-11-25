@@ -54,14 +54,14 @@
   </div>
   <div class="hero-row">
     <div class="hero-copy">
-      <p class="lead">A clickable wireframe explains an idea better than pages of requirements, and changing it is cheap. Type <span class="kbd">/wireframe</span> and a brief: Claude builds a working LoFi prototype with test users you can sign in as. Iterate with comments until everyone agrees, then spec it your way and design the HiFi screens.</p>
+      <p class="lead">A clickable wireframe explains an idea better than pages of requirements, and changing it is cheap. Type <span class="kbd">/sketch</span> and a brief: Claude builds a working LoFi prototype with test users you can sign in as. Iterate with comments until everyone agrees, then spec it your way and design the HiFi screens.</p>
       <div class="ctas">
         <a class="btn pri" href="#install">Get started</a>
         <a class="btn sec" href="library/">Browse the component library →</a>
       </div>
     </div>
     <div class="hero-term">
-<pre class="code" aria-label="Example session"><span class="p">›</span> /wireframe an expense approval tool for small finance teams
+<pre class="code" aria-label="Example session"><span class="p">›</span> /sketch an expense approval tool for small finance teams
 <span class="d">  ◇ Planning 6 screens · 3 collections · 6 users</span>
 <span class="d">  ◇ Seeding: empty, submitter, approver, admin, trial, viewer</span>
 <span class="d">  ◇ Building with the wf library · lint passed</span>
@@ -127,7 +127,7 @@
   <div class="wrap pad stack">
     <div class="intro"><span class="eyebrow">How it works</span><h2>From a brief to an agreed wireframe, then on to your spec.</h2></div>
     <div class="grid">
-      <div class="card step"><span class="num">01 · Brief</span><h3>/wireframe &lt;what you want&gt;</h3><p>A sentence is enough. If the brief is truly ambiguous, Claude asks one round of short questions. Otherwise it decides and writes its assumptions down.</p></div>
+      <div class="card step"><span class="num">01 · Brief</span><h3>/sketch &lt;what you want&gt;</h3><p>A sentence is enough. If the brief is truly ambiguous, Claude asks one round of short questions. Otherwise it decides and writes its assumptions down.</p></div>
       <div class="card step"><span class="num">02 · Build</span><h3>Working, not pictures</h3><p>Claude plans the screens, the data and the test users, then builds them from the wf library. Forms save, lists filter, permissions apply and every screen has its empty state.</p></div>
       <div class="card step agent"><span class="num">03 · Iterate</span><h3>Prompt or comment</h3><p>Share it, click through it, press C and comment on anything. The agent changes it while you watch. Repeat until everyone agrees.</p></div>
       <div class="card step"><span class="num">04 · Hand over</span><h3>Spec it your way</h3><p>The screens and WIREFRAME.md feed whatever you use next: a plain document, Spec Kit, OpenSpec or your team’s template. Designers get the agreed screens as the HiFi brief.</p></div>
@@ -165,7 +165,7 @@
     <div class="flow">
       <div><span class="k" style="color:var(--cmt-light)">1 · In the browser</span><b>Press C, click, write</b><span>The cursor turns into a speech bubble. Tick “Send to coding agent” and an orange pin marks the spot.</span></div>
       <div><span class="k">2 · On your computer</span><b>The wf helper queues it</b><span>Every comment is saved with the project. Ticked ones go to the agent’s inbox.</span></div>
-      <div style="border-color:var(--agent-light)"><span class="k" style="color:var(--agent-light)">3 · Live, on the comment</span><b>Watch the agent work</b><span>Your /wireframe session picks it up. If none is open, a short background run does. Either way, the steps stream onto the comment.</span></div>
+      <div style="border-color:var(--agent-light)"><span class="k" style="color:var(--agent-light)">3 · Live, on the comment</span><b>Watch the agent work</b><span>Your /sketch session picks it up. If none is open, a short background run does. Either way, the steps stream onto the comment.</span></div>
       <div><span class="k" style="color:var(--ok)">4 · Back on screen</span><b>Reload, reply, resolved</b><span>The page refreshes, the agent replies and the pin resolves. Every thread stays under Threads (T).</span></div>
     </div>
 <pre class="code" style="background:#2A2A27;font-size:13px">── Comment #3 · working ─────────────────────────
@@ -227,7 +227,7 @@ Let me approve over-policy rows with a note instead of blocking.
     <p class="lead">No npm installs, build tools or databases. Prototypes are plain HTML files in a folder. If your computer is missing anything, Claude explains it in one sentence and sets it up after you say yes.</p>
   </div>
   <div class="setup">
-    <div class="soft"><span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><div><b>Claude Code</b><span>Where you type /wireframe</span></div></div>
+    <div class="soft"><span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><div><b>Claude Code</b><span>Where you type /sketch</span></div></div>
     <div class="soft now"><span class="n">2</span><div><b>The wf helper</b><span>Runs prototypes on this computer. Brings its own runtime if needed, with no admin rights.</span></div></div>
     <div class="soft"><span class="n">3</span><div><b>A Wireframes folder</b><span>Each prototype gets its own folder you can zip and share</span></div></div>
     <div class="soft"><span class="n">4</span><div><b>Your first brief</b><span>Switch users and leave your first comment</span></div></div>
@@ -240,13 +240,13 @@ Let me approve over-policy rows with a note instead of blocking.
     <div class="install">
       <div><span class="num">1 · Add the plugin source</span><pre class="code"><span class="p">›</span> <span data-copy>/plugin marketplace add dobrinov/wireframe</span></pre></div>
       <div><span class="num">2 · Install it</span><pre class="code"><span class="p">›</span> <span data-copy>/plugin install wireframe@dobrinov</span></pre></div>
-      <div><span class="num">3 · Let Claude set up the rest</span><pre class="code"><span class="p">›</span> <span data-copy>/wireframe setup</span></pre></div>
+      <div><span class="num">3 · Let Claude set up the rest</span><pre class="code"><span class="p">›</span> <span data-copy>/sketch setup</span></pre></div>
     </div>
     <div class="soft cmds">
-      <div><span class="mono"><b>/wireframe</b> &lt;brief&gt;</span><span>Start a new prototype in ~/Wireframes</span></div>
-      <div><span class="mono"><b>/wireframe</b> open &lt;name&gt;</span><span>Pick up an earlier one</span></div>
-      <div><span class="mono"><b>/wireframe</b> users</span><span>Review and revise the seeded users</span></div>
-      <div><span class="mono"><b>/wireframe</b> doctor</span><span>Check and fix the setup in plain language</span></div>
+      <div><span class="mono"><b>/sketch</b> &lt;brief&gt;</span><span>Start a new prototype in ~/Wireframes</span></div>
+      <div><span class="mono"><b>/sketch</b> open &lt;name&gt;</span><span>Pick up an earlier one</span></div>
+      <div><span class="mono"><b>/sketch</b> users</span><span>Review and revise the seeded users</span></div>
+      <div><span class="mono"><b>/sketch</b> doctor</span><span>Check and fix the setup in plain language</span></div>
       <div><span class="mono"><b>U</b> · <b>C</b> · <b>T</b> · <b>H</b></span><span>In the prototype: switch user, comment, threads, hide toolbar</span></div>
       <div><span class="mono"><b>wf library</b></span><span>Open the live component gallery</span></div>
     </div>

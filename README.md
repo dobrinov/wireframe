@@ -4,10 +4,10 @@
 
 **Don’t write the spec. Wireframe it.** A clickable LoFi prototype communicates an idea better than pages of requirements, and it is cheap to change. When everyone agrees, use it as the input for your spec, in whatever format or tool you use (a plain document, Spec Kit, OpenSpec, a team template), and as the brief for HiFi screens.
 
-Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cast of seeded test users, then builds a **working** LoFi prototype from the `wf` component library and opens it in your browser. Iterate by prompting in Claude Code, or by clicking anything in the prototype and leaving a comment. Tick **Send to coding agent** and the comment reaches the running Claude Code session, along with the user you were signed in as.
+Type `/sketch` and a one-line brief. Claude plans the screens, data and a cast of seeded test users, then builds a **working** LoFi prototype from the `wf` component library and opens it in your browser. Iterate by prompting in Claude Code, or by clicking anything in the prototype and leaving a comment. Tick **Send to coding agent** and the comment reaches the running Claude Code session, along with the user you were signed in as.
 
 ```
-/wireframe an expense approval tool for small finance teams
+/sketch an expense approval tool for small finance teams
 ```
 
 **Website and live component library:** https://dobrinov.github.io/wireframe/
@@ -16,9 +16,9 @@ Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cas
 
 | Part | Where | What it does |
 |---|---|---|
-| `/wireframe` skill | `skills/wireframe/` | The workflow Claude follows: setup, plan, seed users, build, run, listen for comments, iterate, revise users |
+| `/sketch` skill (`/wireframe:sketch`) | `skills/sketch/` | The workflow Claude follows: setup, plan, seed users, build, run, listen for comments, iterate, revise users |
 | Component library | `lib/wf.css`, `lib/wf.js` | ~70 greyscale components as plain web components, plus a mock data store and helpers. No build step |
-| Style rules | `skills/wireframe/reference/STYLE.md` | Tokens, states, anatomy, and a recipe so new components match the existing ones |
+| Style rules | `skills/sketch/reference/STYLE.md` | Tokens, states, anatomy, and a recipe so new components match the existing ones |
 | Harness | `lib/harness.js` | Injected into every prototype: user switcher (U), comment mode (C), threads panel (T), pins, live agent activity, live reload |
 | `wf` helper | `bin/wf.js`, `src/` | Zero-dependency Node CLI: local server, comment inbox, agent bridge, lint, doctor, setup |
 | Installer | `install/bootstrap.sh`, `install/bootstrap.ps1` | For computers without Node: installs a private runtime in `~/.wireframe/runtime`, no admin rights needed |
@@ -33,17 +33,17 @@ Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cas
    /plugin install wireframe@dobrinov
    ```
    (Working on the kit itself? Use `/plugin marketplace add /path/to/this/folder` instead.)
-2. Type `/wireframe setup`. Claude checks the computer, installs what's missing (asking first), and creates `~/Wireframes`. Nobody needs to touch a terminal.
+2. Type `/sketch setup`. Claude checks the computer, installs what's missing (asking first), and creates `~/Wireframes`. Nobody needs to touch a terminal.
 
 Already have Node 18+? `node bin/wf.js setup` does the same from a shell.
 
 ## Using it
 
-- `/wireframe <brief>`: new prototype in `~/Wireframes/<name>`, opened in the browser.
-- `/wireframe <brief>` inside a code repository: Claude reads the app first (pages, nav, data model, roles, copy), then wireframes the change on top of the real app. The prototype lives in the repository, in `wireframes/<name>/` by default, with its runtime files gitignored. The hand-over spec names the code each requirement touches.
+- `/sketch <brief>`: new prototype in `~/Wireframes/<name>`, opened in the browser.
+- `/sketch <brief>` inside a code repository: Claude reads the app first (pages, nav, data model, roles, copy), then wireframes the change on top of the real app. The prototype lives in the repository, in `wireframes/<name>/` by default, with its runtime files gitignored. The hand-over spec names the code each requirement touches.
 - Talk to Claude to change it, or comment in the browser: press **C**, click anything, write, and tick *Send to coding agent*.
 - Press **U** to switch seeded users. Each one shows a different state: empty, power user, each role, each plan, edge cases. Claude revises the cast as the prototype grows.
-- `/wireframe` inside a prototype folder resumes it. `/wireframe open <name>` opens an older one.
+- `/sketch` inside a prototype folder resumes it. `/sketch open <name>` opens an older one.
 
 ### How comments reach the agent
 ```

@@ -1,9 +1,9 @@
 ---
-name: wireframe
-description: Build and iterate working LoFi wireframe prototypes from a one-line brief, with seeded test users, a user switcher and on-screen comments that come back to you. Use when the user types /wireframe, asks to "wireframe", "prototype" or "mock up" an app, flow or screen, wants to change an existing wireframe prototype, asks to set up or fix the wireframing tool, or when comments from a prototype arrive.
+name: sketch
+description: Build and iterate working LoFi wireframe prototypes from a one-line brief, with seeded test users, a user switcher and on-screen comments that come back to you. Use when the user types /sketch (or /wireframe:sketch, or the old /wireframe), asks to "wireframe", "prototype" or "mock up" an app, flow or screen, wants to change an existing wireframe prototype, asks to set up or fix the wireframing tool, or when comments from a prototype arrive.
 ---
 
-# /wireframe
+# /sketch
 
 You build clickable, **LoFi** prototypes with the `wf` library and keep improving them with the user. The person may not be technical: speak plainly, never ask them to type terminal commands, and do the setup yourself.
 
@@ -18,7 +18,7 @@ In the steps below, `wf` means whichever of these works.
 
 ## 1. What was asked
 
-Read the arguments after `/wireframe`:
+Read the arguments after `/sketch`:
 
 | Arguments | Do |
 |---|---|
@@ -41,7 +41,7 @@ A code repository means the nearest folder above with `.git`, holding app code. 
 2. For each failed check, say in one plain sentence what is missing, then fix it yourself after a yes:
    - `wf` → `node KIT/bin/wf.js setup` (makes `~/Wireframes`, installs the `wf` command, adds it to PATH).
    - `home` → same `setup` command.
-   - `plugin` → it is already running if you are reading this, so just mention `/wireframe` is ready.
+   - `plugin` → it is already running if you are reading this, so just mention `/sketch` is ready.
    - `claude` → cannot be missing while you run; ignore.
 3. **No Node.js** → explain: "The prototypes need a small runtime (about 50 MB). I'll install a private copy just for this tool. It won't change anything else on your computer." Then run `sh KIT/install/bootstrap.sh` on Mac/Linux or `powershell -ExecutionPolicy Bypass -File KIT/install/bootstrap.ps1` on Windows. It downloads Node into `~/.wireframe/runtime`, then runs `wf setup`.
 4. Re-run `wf doctor` and confirm in one line: "All set. Tell me what you'd like to sketch."
@@ -49,7 +49,7 @@ A code repository means the nearest folder above with `.git`, holding app code. 
 ## 3. New prototype
 
 1. **Understand the brief.** If it is really ambiguous (you can't tell who uses it or what the main job is), ask **one** round of at most 3 short questions. Otherwise decide, and list your assumptions in WIREFRAME.md and in your reply.
-2. **Read the references before writing any screen**, once per session: `KIT/skills/wireframe/reference/STYLE.md`, `COMPONENTS.md`, `PATTERNS.md`, `PERSONAS.md`.
+2. **Read the references before writing any screen**, once per session: `KIT/skills/sketch/reference/STYLE.md`, `COMPONENTS.md`, `PATTERNS.md`, `PERSONAS.md`.
 3. **Create:** `wf new "<short name>" --json`, or with `--dir <folder>` when 3b chose one. Work inside the folder it prints (by default `~/Wireframes/<slug>`).
 4. **Plan in WIREFRAME.md:** brief, assumptions, 4–8 screens for v1 (one HTML file each), the data model (collections and fields), seeded users and why each exists, and open questions. Keep v1 small and end to end. One flow that works beats ten dead screens.
 5. **Seed users and data** per PERSONAS.md. If roles act on the same records (approvals, hand-offs), use a shared world. If the brief is a new app embedded in an existing one, follow “Embedded apps” in PATTERNS.md. `seed/users.json` plus one `seed/<id>.json` per user (and `seed/shared.json` for data everyone sees). Make the data realistic, internally consistent, and specific to the domain. Each user's `stats` must match their seed.

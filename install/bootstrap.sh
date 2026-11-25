@@ -1,5 +1,5 @@
 #!/bin/sh
-# Gets a computer ready for /wireframe without needing anything pre-installed.
+# Gets a computer ready for /sketch without needing anything pre-installed.
 # - Uses Node.js if a recent one (18+) is already there.
 # - Otherwise downloads a private copy of Node.js into ~/.wireframe/runtime
 #   (no admin rights, nothing else on the computer changes).

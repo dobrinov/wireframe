@@ -134,7 +134,7 @@ export async function serve({ root, port = 4321, open = false, library = false, 
       if (!claude) { log('  ! No agent is listening and Claude Code was not found; comments stay queued.'); return; }
       for (const c of queued) updateComment(root, c.id, { status: 'working' });
       const prompt = [
-        'You are the /wireframe agent for the LoFi prototype in this folder. No interactive session was listening, so you were started to handle comments left on the prototype.',
+        'You are the /sketch agent for the LoFi prototype in this folder. No interactive session was listening, so you were started to handle comments left on the prototype.',
         'Read WIREFRAME.md, then follow the wireframe skill (style rules and components). For each comment below: make the change in screens/ or seed/, keep it LoFi and on-library, then run the reply command it shows with a one-line summary.',
         '', ...queued.map((c) => formatForAgent({ ...c, status: 'working' })),
       ].join('\n');

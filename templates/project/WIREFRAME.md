@@ -1,6 +1,6 @@
 # {{NAME}}
 
-> LoFi prototype built with /wireframe. Started {{DATE}}.
+> LoFi prototype built with /sketch. Started {{DATE}}.
 > This file is the agent's memory for the prototype: keep it current after every change.
 
 ## Brief

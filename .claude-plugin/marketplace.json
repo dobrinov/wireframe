@@ -6,7 +6,7 @@
     {
       "name": "wireframe",
       "source": "./",
-      "description": "/wireframe: build and iterate working LoFi prototypes with seeded users and on-UI comments."
+      "description": "/sketch: build and iterate working LoFi prototypes with seeded users and on-UI comments."
     }
   ]
 }

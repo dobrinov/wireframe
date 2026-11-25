@@ -276,7 +276,7 @@ function cmdStatus(dir) {
 }
 
 function cmdDocs(name = 'index') {
-  const dir = path.join(KIT_ROOT, 'skills', 'wireframe', 'reference');
+  const dir = path.join(KIT_ROOT, 'skills', 'sketch', 'reference');
   const map = { index: null, style: 'STYLE.md', components: 'COMPONENTS.md', personas: 'PERSONAS.md', patterns: 'PATTERNS.md' };
   if (!map[name]) {
     console.log('Docs: ' + Object.keys(map).filter((k) => map[k]).join(', '));
@@ -296,7 +296,7 @@ function checks() {
   const major = Number(process.versions.node.split('.')[0]);
   add('runtime', major >= 18, `Runtime: Node ${process.versions.node}`, 'Run install/bootstrap.sh (Mac) or install/bootstrap.ps1 (Windows); it installs a private runtime for wf.');
   const wfPath = which('wf');
-  add('wf', !!wfPath, wfPath ? `wf command: ${wfPath}` : 'wf command is not on your PATH', 'Run: wf setup (or ask Claude: "/wireframe setup").');
+  add('wf', !!wfPath, wfPath ? `wf command: ${wfPath}` : 'wf command is not on your PATH', 'Run: wf setup (or ask Claude: "/sketch setup").');
   if (wfPath) {
     const pathDirs = (process.env.PATH || '').split(path.delimiter);
     if (!pathDirs.includes(shimDir()) && wfPath.startsWith(shimDir())) add('path', false, 'PATH', `Add ${shimDir()} to your PATH.`);
@@ -305,8 +305,8 @@ function checks() {
   add('claude', !!claude, claude ? `Claude Code: ${claude}` : 'Claude Code not found', 'Install Claude Code from https://claude.com/claude-code, then reopen this window.');
   add('home', fs.existsSync(DEFAULT_HOME), `Prototypes folder: ${DEFAULT_HOME}`, 'Run: wf setup');
   const installed = readJSON(path.join(os.homedir(), '.claude', 'plugins', 'installed_plugins.json'), {});
-  const hasPlugin = JSON.stringify(installed).includes('wireframe@') || fs.existsSync(path.join(os.homedir(), '.claude', 'skills', 'wireframe', 'SKILL.md'));
-  add('plugin', hasPlugin, hasPlugin ? '/wireframe is installed in Claude Code' : '/wireframe is not installed in Claude Code yet',
+  const hasPlugin = JSON.stringify(installed).includes('wireframe@') || ['sketch', 'wireframe'].some((s) => fs.existsSync(path.join(os.homedir(), '.claude', 'skills', s, 'SKILL.md')));
+  add('plugin', hasPlugin, hasPlugin ? '/sketch is installed in Claude Code' : '/sketch is not installed in Claude Code yet',
     `In Claude Code run: /plugin marketplace add ${KIT_ROOT}  then  /plugin install wireframe@dobrinov`);
   const proj = findProject(process.cwd());
   if (proj) {
@@ -328,7 +328,7 @@ function cmdDoctor(flags) {
   if (flags.json) return console.log(JSON.stringify({ ok: list.every((c) => c.ok), checks: list }, null, 2));
   for (const c of list) console.log(`${c.ok ? '✓' : '✗'} ${c.label}${c.fix ? `\n    → ${c.fix}` : ''}`);
   const bad = list.filter((c) => !c.ok).length;
-  console.log(bad ? `\n${bad} thing(s) to fix.` : '\nAll good. In Claude Code, type: /wireframe <what you want to build>');
+  console.log(bad ? `\n${bad} thing(s) to fix.` : '\nAll good. In Claude Code, type: /sketch <what you want to build>');
   if (bad) process.exitCode = 1;
 }
 

@@ -1,6 +1,6 @@
 # Ledgerline · Expense approvals
 
-> LoFi prototype built with /wireframe. This file is the agent's memory for the prototype.
+> LoFi prototype built with /sketch. This file is the agent's memory for the prototype.
 
 ## Brief
 "An expense approval tool for small finance teams."
