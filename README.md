@@ -2,7 +2,7 @@
 
 # Wireframe: agentic LoFi wireframing for Claude Code
 
-**Don’t write the spec. Wireframe it.** A clickable LoFi prototype communicates an idea better than pages of requirements, and it is cheap to change. When everyone agrees, turn it into a written spec and HiFi screens.
+**Don’t write the spec. Wireframe it.** A clickable LoFi prototype communicates an idea better than pages of requirements, and it is cheap to change. When everyone agrees, use it as the input for your spec, in whatever format or tool you use (a plain document, Spec Kit, OpenSpec, a team template), and as the brief for HiFi screens.
 
 Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cast of seeded test users, then builds a **working** LoFi prototype from the `wf` component library and opens it in your browser. Iterate by prompting in Claude Code, or by clicking anything in the prototype and leaving a comment. Tick **Send to coding agent** and the comment reaches the running Claude Code session, along with the user you were signed in as.
 

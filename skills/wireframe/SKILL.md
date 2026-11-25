@@ -27,6 +27,7 @@ Read the arguments after `/wireframe`:
 | nothing, or a change request, inside a prototype folder (has `seed/users.json`) | **Iterate** |
 | `users` / "who are the test users" | **Revise users** |
 | `inbox` / "check comments" | **Handle comments** |
+| `spec` / "write the spec" / "hand this over" | **Hand over** (section 7) |
 | `open <name>` / "show me <name>" | Run it (step 3.8) from `~/Wireframes/<name>` |
 
 If there are no arguments and you are not inside a prototype, list `~/Wireframes/*` and ask which to open, or what to build.
@@ -94,6 +95,17 @@ The cast of seeded users is part of the design and must evolve with it. Follow P
 - When you add a user, set `addedIn` (the version, e.g. `"v3"`) and `addedBecause` (e.g. `"comment #12"` or `"billing added"`).
 - Keep `why` and `tests` accurate, and keep `stats` matching the seed.
 - Tell the user about cast changes in one line.
+
+## 7. Hand over (spec and HiFi)
+
+The agreed wireframe is the input for the next step; the person decides the format.
+1. Ask, in one question, how they want the spec unless they already said or the project shows it:
+   - a plain Markdown document (default if they don't care);
+   - a spec tool they use, such as Spec Kit, OpenSpec or a team template. Look for its traces first (for example a `.specify/` or `openspec/` folder, a template file, or a project CLAUDE.md that names one) and follow that tool's own commands and structure; don't recreate it by hand.
+2. Sources, in this order: WIREFRAME.md (brief, assumptions, decisions, data model, users, open questions, changelog), the screens and their behaviour, the seed data (realistic examples and edge cases), and resolved comment threads (decisions and their reasons).
+3. Cover what the wireframe proves: user roles and permissions, flows step by step, states (empty, error, loading, limits), the data model, validation rules and the open questions still to settle. Link each requirement to the screen that shows it.
+4. Don't invent visual design. If they want HiFi screens, the agreed wireframe and its users are the brief.
+5. Save the spec where they ask; if they don't say, `spec/` inside the prototype folder. Note it in the WIREFRAME.md changelog.
 
 ## Rules
 
