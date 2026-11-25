@@ -137,6 +137,8 @@ wf-search kbd { position: absolute; right: 12px; top: 50%; transform: translateY
 wf-app { display: flex; flex-wrap: wrap; min-height: 100vh; align-items: stretch; }
 wf-app > main, wf-app > wf-page, wf-app > .wf-main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; }
 wf-sidebar { flex: 1 1 220px; max-width: 260px; background: var(--wf-surface); border-right: var(--wf-stroke) solid var(--wf-ink); padding: var(--wf-s-4) 10px; display: flex; flex-direction: column; gap: 2px; }
+/* The sidebar stays put while the page scrolls (wide screens); it scrolls itself if it is taller than the window. */
+@media (min-width: 721px) { wf-sidebar { position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; } }
 @media (max-width: 720px) { wf-sidebar { max-width: none; border-right: 0; border-bottom: var(--wf-stroke) solid var(--wf-ink); flex-direction: row; flex-wrap: wrap; } wf-sidebar .wf-x-brand { width: 100%; } }
 wf-sidebar .wf-x-brand { display: flex; align-items: center; gap: var(--wf-s-2); padding: 2px 6px var(--wf-s-4); font-weight: 700; font-size: 15px; }
 wf-sidebar .wf-x-brand .wf-x-logo { width: 24px; height: 24px; border-radius: var(--wf-r-sm); background: var(--wf-fill); border: var(--wf-stroke-thin) solid var(--wf-divider); }
