@@ -13,13 +13,13 @@ fs.rmSync(out, { recursive: true, force: true });
 fs.cpSync(path.join(root, 'site'), out, { recursive: true });
 
 fs.mkdirSync(path.join(out, 'wf'), { recursive: true });
-for (const f of ['wf.css', 'wf.js']) fs.copyFileSync(path.join(root, 'lib', f), path.join(out, 'wf', f));
+for (const f of ['wf.css', 'wf.js', 'library-data.js']) fs.copyFileSync(path.join(root, 'lib', f), path.join(out, 'wf', f));
 
 let lib = fs.readFileSync(path.join(root, 'lib', 'library.html'), 'utf8');
 lib = lib.replaceAll('/_wf/', '../wf/');
 lib = lib.replace('<link rel="stylesheet"', '<script>window.wfStatic = true;</script>\n<link rel="stylesheet"');
-lib = lib.replace('<wf-sidebar brand="wf library">', '<wf-sidebar brand="wf library">\n    <wf-nav-item href="../" icon="arrow-left">Wireframe home</wf-nav-item>');
-if (!lib.includes('window.wfStatic') || !lib.includes('Wireframe home')) throw new Error('library.html changed shape; update scripts/build-site.js');
+lib = lib.replace('href="https://dobrinov.github.io/wireframe/"', 'href="../"');
+if (!lib.includes('window.wfStatic') || !lib.includes('href="../"')) throw new Error('library.html changed shape; update scripts/build-site.js');
 fs.mkdirSync(path.join(out, 'library'), { recursive: true });
 fs.writeFileSync(path.join(out, 'library', 'index.html'), lib);
 fs.writeFileSync(path.join(out, '.nojekyll'), '');

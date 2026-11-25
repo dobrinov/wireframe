@@ -1,3 +1,5 @@
+<img src="site/logo.svg" width="56" alt="Wireframe logo: the letter w in square brackets">
+
 # Wireframe: agentic LoFi wireframing for Claude Code
 
 Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cast of seeded test users, then builds a **working** LoFi prototype from the `wf` component library and opens it in your browser. Iterate by prompting in Claude Code, or by clicking anything in the prototype and leaving a comment. Tick **Send to coding agent** and the comment reaches the running Claude Code session, along with the user you were signed in as.
