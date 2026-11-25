@@ -30,7 +30,7 @@ Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cas
 1. In Claude Code:
    ```
    /plugin marketplace add dobrinov/wireframe
-   /plugin install wireframe@wireframe
+   /plugin install wireframe@dobrinov
    ```
    (Working on the kit itself? Use `/plugin marketplace add /path/to/this/folder` instead.)
 2. Type `/wireframe setup`. Claude checks the computer, installs what's missing (asking first), and creates `~/Wireframes`. Nobody needs to touch a terminal.
