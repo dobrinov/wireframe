@@ -18,12 +18,63 @@ const TYPES = {
 const LIB = path.join(KIT_ROOT, 'lib');
 const HARNESS_TAG = '<script type="module" src="/_wf/harness.js"></script>';
 
+// Turn one `claude -p --output-format stream-json` event into short, plain progress lines.
+function describeStreamEvent(ev, root) {
+  if (ev.type !== 'assistant') return [];
+  const rel = (f) => (f ? path.relative(root, String(f)) || String(f) : '');
+  const out = [];
+  for (const part of ev.message?.content || []) {
+    if (part.type === 'text' && part.text?.trim()) out.push(part.text.trim().split('\n')[0].slice(0, 140));
+    if (part.type !== 'tool_use') continue;
+    const i = part.input || {};
+    if (part.name === 'Read') out.push(`Reading ${rel(i.file_path)}`);
+    else if (part.name === 'Edit' || part.name === 'MultiEdit') out.push(`Editing ${rel(i.file_path)}`);
+    else if (part.name === 'Write') out.push(`Writing ${rel(i.file_path)}`);
+    else if (part.name === 'Glob' || part.name === 'Grep') out.push(`Searching for ${String(i.pattern || '').slice(0, 60)}`);
+    else if (part.name === 'Bash') out.push(/\breply\b/.test(i.command || '') ? 'Replying on the comment' : /\blint\b/.test(i.command || '') ? 'Checking style rules (wf lint)' : `Running ${String(i.command || '').slice(0, 60)}`);
+    else if (part.name === 'Skill') out.push(`Loading the ${i.skill || i.command || ''} skill`.replace('  ', ' '));
+    else if (part.name === 'TodoWrite') out.push('Planning the steps');
+    else out.push(`Using ${part.name}`);
+  }
+  return out;
+}
+
 export async function serve({ root, port = 4321, open = false, library = false, quiet = false }) {
   const p = root ? paths(root) : null;
   const browsers = new Set();
   const watchers = new Set();
   let headless = null;
   let headlessTimer = null;
+  let headlessAt = null;
+  // Live agent activity shown in the browser: who is working, where, and what it is doing.
+  let run = null;      // { kind, ids, startedAt, where, steps[] }
+  let lastRun = null;  // the previous run, kept so the browser can say "finished in 40s"
+  const startRun = (kind, ids, where) => {
+    run = { kind, ids, startedAt: new Date().toISOString(), where, steps: [] };
+    step(kind === 'headless' ? 'Started a background Claude Code run' : 'Handed to Claude Code');
+  };
+  const step = (text) => {
+    if (!run || !text) return;
+    const last = run.steps[run.steps.length - 1];
+    if (last && last.text === text) return;
+    run.steps.push({ at: new Date().toISOString(), text: String(text).slice(0, 160) });
+    if (run.steps.length > 40) run.steps.shift();
+    send(browsers, 'agent', agentState());
+  };
+  const finishRun = (extra = {}) => {
+    if (!run) return;
+    lastRun = { ...run, where: { ...run.where }, endedAt: new Date().toISOString(), ...extra };
+    const { kind, startedAt, endedAt, steps } = lastRun;
+    for (const id of run.ids) {
+      try { updateComment(root, id, { agentRun: { kind, startedAt, endedAt, steps, label: run.where?.label, detail: run.where?.detail, cwd: run.where?.cwd } }); } catch {}
+    }
+    run = null;
+  };
+  const endRunIfDone = () => {
+    if (!run || run.kind === 'headless') return;
+    const open = pending(root).filter((c) => run.ids.includes(c.id) && c.status === 'working');
+    if (!open.length) finishRun();
+  };
   const log = (...a) => { if (!quiet) console.log(...a); };
 
   const send = (set, event, data) => {
@@ -35,6 +86,9 @@ export async function serve({ root, port = 4321, open = false, library = false, 
     headless: !!headless,
     queued: root ? pending(root).filter((c) => c.status === 'queued').length : 0,
     working: root ? pending(root).filter((c) => c.status === 'working').length : 0,
+    run, lastRun,
+    headlessAt: headlessAt && !headless && root && pending(root).some((c) => c.status === 'queued') ? headlessAt : null,
+    listener: [...watchers].map((w) => w.wfInfo).find(Boolean) || null,
   });
   const broadcastComments = () => {
     if (!root) return;
@@ -54,6 +108,9 @@ export async function serve({ root, port = 4321, open = false, library = false, 
     if (!queued.length) return;
     if (watchers.size) {
       const items = queued.map((c) => updateComment(root, c.id, { status: 'working' }));
+      const info = [...watchers].map((w) => w.wfInfo).find(Boolean);
+      if (run && run.kind === 'session') { run.ids.push(...items.map((c) => c.id)); step(`Received #${items.map((c) => c.id).join(', #')}`); }
+      else startRun('session', items.map((c) => c.id), info || { label: 'Claude Code session', cwd: root });
       send(watchers, 'items', items.map((c) => ({ ...c, text: formatForAgent(c) })));
       broadcastComments();
       return;
@@ -64,8 +121,12 @@ export async function serve({ root, port = 4321, open = false, library = false, 
   function maybeHeadless() {
     const cfg = loadConfig(root);
     if (!cfg.headless || headless || headlessTimer) return;
+    const delay = (cfg.headlessDelaySec ?? 20) * 1000;
+    headlessAt = new Date(Date.now() + delay).toISOString();
+    send(browsers, 'agent', agentState());
     headlessTimer = setTimeout(() => {
       headlessTimer = null;
+      headlessAt = null;
       if (watchers.size || headless) return;
       const queued = pending(root).filter((c) => c.status === 'queued');
       if (!queued.length) return;
@@ -80,13 +141,25 @@ export async function serve({ root, port = 4321, open = false, library = false, 
       const logFd = fs.openSync(p.headlessLog, 'a');
       fs.writeSync(logFd, `\n===== ${new Date().toISOString()} headless run for #${queued.map((c) => c.id).join(', #')}\n`);
       log(`  ↻ No agent listening; starting a headless Claude Code run for ${queued.length} comment(s).`);
-      headless = spawn(claude, ['-p', prompt, '--permission-mode', 'acceptEdits', '--allowedTools', 'Read', 'Edit', 'Write', 'Glob', 'Grep', 'Bash(wf *)', 'Bash(node *wf.js *)'], {
-        cwd: root, stdio: ['ignore', logFd, logFd], env: { ...process.env, WF_HEADLESS: '1' },
+      headless = spawn(claude, ['-p', prompt, '--output-format', 'stream-json', '--verbose', '--permission-mode', 'acceptEdits', '--allowedTools', 'Read', 'Edit', 'Write', 'Glob', 'Grep', 'Bash(wf *)', 'Bash(node *wf.js *)'], {
+        cwd: root, stdio: ['ignore', 'pipe', logFd], env: { ...process.env, WF_HEADLESS: '1' },
+      });
+      startRun('headless', queued.map((c) => c.id), { label: 'Background Claude Code run', detail: 'Started by the prototype server because no Claude Code session was listening', cwd: root, pid: headless.pid });
+      let out = '';
+      headless.stdout.on('data', (chunk) => {
+        fs.writeSync(logFd, chunk);
+        out += chunk;
+        let i;
+        while ((i = out.indexOf('\n')) >= 0) {
+          const line = out.slice(0, i); out = out.slice(i + 1);
+          try { describeStreamEvent(JSON.parse(line), root).forEach(step); } catch {}
+        }
       });
       broadcastComments();
       headless.on('exit', (code) => {
         fs.closeSync(logFd);
         headless = null;
+        if (run) { step(code === 0 ? 'Finished' : `Stopped (exit ${code})`); finishRun({ exit: code }); }
         // Anything the run did not resolve goes back to the queue for the next agent.
         for (const c of pending(root)) if (c.status === 'working') updateComment(root, c.id, { status: 'queued' });
         log(`  ↻ Headless run finished (exit ${code}).`);
@@ -106,6 +179,7 @@ export async function serve({ root, port = 4321, open = false, library = false, 
         clearTimeout(reloadTimer);
         reloadTimer = setTimeout(() => {
           const files = [...changed]; changed = new Set();
+          if (run) for (const f of files.filter((f) => !/\.tmp\b|~$|\.swp$/.test(f)).slice(0, 3)) step(`Saved ${f}`);
           const cssOnly = files.every((f) => f.endsWith('.css'));
           const seed = files.some((f) => f.startsWith('seed'));
           send(browsers, 'reload', { files, cssOnly, seed });
@@ -133,6 +207,12 @@ export async function serve({ root, port = 4321, open = false, library = false, 
       }
       if (route === '/_wf/api/agent/stream') {
         sse(res);
+        const q = url.searchParams;
+        res.wfInfo = {
+          label: q.get('client') === 'claude-code' ? 'Claude Code session' : 'Coding agent',
+          detail: [q.get('term') && `in ${q.get('term')}`, q.get('session') && `session ${q.get('session')}`, q.get('pid') && `pid ${q.get('pid')}`].filter(Boolean).join(' · '),
+          cwd: q.get('cwd') || root, pid: Number(q.get('pid')) || undefined,
+        };
         watchers.add(res);
         send(browsers, 'agent', agentState());
         req.on('close', () => { watchers.delete(res); send(browsers, 'agent', agentState()); });
@@ -148,6 +228,12 @@ export async function serve({ root, port = 4321, open = false, library = false, 
         return seed ? json(res, 200, seed) : json(res, 404, { error: 'no such user' });
       }
       if (route === '/_wf/api/agent') return json(res, 200, agentState());
+      if (route === '/_wf/api/agent/progress' && req.method === 'POST') {
+        const b = await body(req);
+        if (!run) startRun('session', b.id ? [Number(b.id)] : [], [...watchers].map((w) => w.wfInfo).find(Boolean) || { label: 'Claude Code session', cwd: root });
+        step(b.text);
+        return json(res, 200, { ok: true });
+      }
       if (route === '/_wf/api/comments' && req.method === 'GET') return json(res, 200, root ? loadComments(root) : []);
       if (route === '/_wf/api/comments' && req.method === 'POST') {
         if (!root) return json(res, 400, { error: 'no project' });
@@ -159,7 +245,10 @@ export async function serve({ root, port = 4321, open = false, library = false, 
       }
       const m = route.match(/^\/_wf\/api\/comments\/(\d+)$/);
       if (m && req.method === 'PATCH') {
-        const c = updateComment(root, m[1], await body(req));
+        const patch = await body(req);
+        const c = updateComment(root, m[1], patch);
+        if (run && patch.reply?.by === 'agent') step(`Replied on #${c.id}${c.status === 'resolved' ? ' and resolved it' : ''}`);
+        endRunIfDone();
         broadcastComments();
         if (c.status === 'queued') scheduleFlush();
         return json(res, 200, c);

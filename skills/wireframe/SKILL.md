@@ -79,6 +79,7 @@ While a prototype is open in this session, always have exactly one `wf watch --o
 
 When it finishes, its output lists one or more comments. For each one:
 - **Screen** is the file to change. **Element** is a CSS selector for what they clicked. **Viewed as** is the seeded user they were signed in as, so reproduce the problem with that user's data and permissions.
+- While you work, show progress in the browser with `wf progress <id> "<what you are doing now>"` (for example "Reading the requests screen", "Adding a sticky filter"). The person sees these steps live on the comment. One line per meaningful step; skip it for trivial changes.
 - If it is clear, make the change, then `wf reply <id> "<one-line summary of what changed>" --resolve`.
 - If it is unclear or needs a decision, `wf reply <id> "<your question>"` (no `--resolve`) and also ask in the terminal.
 

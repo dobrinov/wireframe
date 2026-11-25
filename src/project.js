@@ -147,6 +147,7 @@ export function addComment(root, input) {
     body,
     screen: clean(input.screen, 300),
     title: clean(input.title, 200),
+    host: input.host ? clean(input.host, 300) : undefined,
     anchor: input.anchor && typeof input.anchor === 'object' ? {
       selector: clean(input.anchor.selector, 600),
       text: clean(input.anchor.text, 200),
@@ -179,6 +180,13 @@ export function updateComment(root, id, patch) {
   if (patch.sendToAgent === true && c.status !== 'resolved') { c.sendToAgent = true; c.status = 'queued'; }
   if (patch.status && ['open', 'queued', 'working', 'resolved'].includes(patch.status)) c.status = patch.status;
   if (typeof patch.body === 'string' && patch.body.trim()) c.body = clean(patch.body).trim();
+  if (patch.agentRun && typeof patch.agentRun === 'object') {
+    const r = patch.agentRun;
+    c.agentRuns = [...(c.agentRuns || []), {
+      kind: clean(r.kind, 20), label: clean(r.label, 120), detail: clean(r.detail, 200), cwd: clean(r.cwd, 300),
+      startedAt: clean(r.startedAt, 40), endedAt: clean(r.endedAt, 40), steps: (r.steps || []).slice(-40).map((x) => ({ at: clean(x.at, 40), text: clean(x.text, 160) })),
+    }].slice(-5);
+  }
   c.updatedAt = new Date().toISOString();
   saveComments(root, list);
   return c;

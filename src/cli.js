@@ -20,6 +20,7 @@ Start
 Agent loop
   wf watch [--once]        Wait for comments sent to the agent and print them
   wf inbox                 List comments waiting for the agent
+  wf progress <id> "<text>"            Show what you are doing on a comment, live in the browser
   wf reply <id> "<text>" [--resolve]   Answer a comment (and resolve it)
   wf lint [dir]            Check screens follow the wireframe style rules
   wf snapshot [label]      Save a copy of screens and seed data in history
@@ -42,6 +43,7 @@ export async function main(argv) {
     case 'watch': return cmdWatch(args[0], flags);
     case 'inbox': return cmdInbox(args[0], flags);
     case 'reply': return cmdReply(args, flags);
+    case 'progress': return cmdProgress(args, flags);
     case 'lint': return cmdLint(args[0], flags);
     case 'snapshot': return cmdSnapshot(args[0], flags);
     case 'users': return cmdUsers(args[0], flags);
@@ -140,7 +142,11 @@ async function cmdWatch(dir, flags) {
     }
   }
   if (!flags.quiet) console.log(`Listening for comments on http://localhost:${info.port}/ …`);
-  const res = await fetch(`http://127.0.0.1:${info.port}/_wf/api/agent/stream`, { headers: { origin: `http://localhost:${info.port}` } });
+  const q = new URLSearchParams({ cwd: process.cwd(), pid: process.env.CLAUDE_PID || String(process.ppid) });
+  if (process.env.CLAUDE_CODE_SESSION_ID) q.set('session', process.env.CLAUDE_CODE_SESSION_ID.slice(0, 8));
+  if (process.env.CLAUDECODE || process.env.CLAUDE_CODE_ENTRYPOINT) q.set('client', 'claude-code');
+  if (process.env.TERM_PROGRAM) q.set('term', process.env.TERM_PROGRAM.replace(/\.app$/, ''));
+  const res = await fetch(`http://127.0.0.1:${info.port}/_wf/api/agent/stream?${q}`, { headers: { origin: `http://localhost:${info.port}` } });
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buf = '';
@@ -179,6 +185,15 @@ async function cmdReply(args, flags) {
   else if (flags.open) patch.status = 'open';
   const c = (await viaServer(root, 'PATCH', `/_wf/api/comments/${Number(id)}`, patch)) || updateComment(root, id, patch);
   console.log(`Comment #${c.id} → ${c.status}`);
+}
+
+async function cmdProgress(args, flags) {
+  const [id, ...rest] = args;
+  const text = rest.join(' ').trim();
+  if (!id || !text) throw new Error('usage: wf progress <id> "<what you are doing>"');
+  const root = resolveProject(flags.dir);
+  const ok = await viaServer(root, 'POST', '/_wf/api/agent/progress', { id: Number(id), text });
+  console.log(ok ? `#${id}: ${text}` : 'Prototype server is not running; progress not shown.');
 }
 
 function cmdLint(dir, flags) {
