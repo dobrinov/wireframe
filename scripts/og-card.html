@@ -1,0 +1,81 @@
+<!doctype html>
+<!-- Source of site/og.png (1200×630 social preview). Re-render with: node scripts/render-og.js -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@700&display=block" rel="stylesheet">
+<style>
+  :root { --ink: #1C1C1A; --ink2: #3A3A36; --muted: #55554F; --line: #8A887F; --soft: #C9C7BF; --div: #D6D4CC;
+    --fill: #EFEDE6; --paper: #F7F6F2; --white: #FFFFFF; --agent: #2B59C3; --agent-soft: #EAF0FB; --agent-ink: #1E3F8A; --cmt: #C2410C; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body { background: var(--paper); color: var(--ink); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(var(--div) 1.2px, transparent 1.2px); background-size: 24px 24px; }
+  .card { position: absolute; inset: 0; padding: 64px 72px; display: grid; grid-template-columns: 560px 1fr; gap: 56px; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 14px; font: 700 30px 'Space Grotesk'; letter-spacing: -.01em; }
+  .brand svg { width: 52px; height: 52px; }
+  .eyebrow { margin-top: 44px; font: 500 17px 'JetBrains Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  h1 { margin-top: 14px; font: 700 56px/1.04 'Space Grotesk'; letter-spacing: -.03em; white-space: nowrap; }
+  p { margin-top: 26px; font-size: 23px; line-height: 1.45; color: var(--ink2); }
+  .cmd { display: inline-block; margin-top: 30px; padding: 10px 16px; border-radius: 8px; background: var(--ink); color: var(--paper); font: 500 20px 'JetBrains Mono', monospace; }
+  .cmd b { color: #8FB0F5; font-weight: 500; }
+
+  .mock { position: relative; background: var(--white); border: 2px solid var(--ink); border-radius: 12px; height: 420px; overflow: visible; box-shadow: 8px 8px 0 var(--ink); }
+  .chrome { height: 36px; border-bottom: 1.5px solid var(--div); display: flex; align-items: center; gap: 7px; padding: 0 14px; }
+  .chrome i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--line); }
+  .chrome span { margin-left: 10px; font: 500 12px 'JetBrains Mono'; color: var(--muted); }
+  .scr { display: grid; grid-template-columns: 120px 1fr; height: calc(100% - 36px); }
+  .side { border-right: 1.5px solid var(--div); background: var(--fill); padding: 16px 12px; display: grid; align-content: start; gap: 12px; }
+  .bar { height: 10px; border-radius: 5px; background: var(--soft); }
+  .bar.on { background: var(--ink); }
+  .main { padding: 18px; display: grid; align-content: start; gap: 12px; }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  .head b { font: 600 18px Inter; }
+  .btn { padding: 5px 12px; border: 1.5px solid var(--ink); border-radius: 6px; font: 600 12px Inter; }
+  .btn.dk { background: var(--ink); color: var(--white); }
+  .row { display: grid; grid-template-columns: 14px 1fr 70px; gap: 12px; align-items: center; padding: 9px 10px; border: 1.5px solid var(--div); border-radius: 6px; }
+  .row .box { width: 14px; height: 14px; border: 1.5px solid var(--line); border-radius: 3px; }
+  .row .t { height: 9px; border-radius: 5px; background: var(--soft); }
+  .row .n { height: 9px; border-radius: 5px; background: var(--line); }
+  .row.c { border: 2px dashed var(--cmt); }
+  .pin { position: absolute; left: 290px; top: 150px; width: 30px; height: 30px; border-radius: 50% 50% 50% 4px; background: var(--cmt); color: var(--white);
+    display: grid; place-items: center; font: 700 14px Inter; }
+  .thread { position: absolute; right: -26px; bottom: -30px; width: 290px; background: var(--white); border: 2px solid var(--ink); border-radius: 10px; padding: 14px; box-shadow: 6px 6px 0 var(--ink); }
+  .thread .top { display: flex; justify-content: space-between; font: 600 13px Inter; }
+  .thread .st { color: var(--agent); font: 500 12px 'JetBrains Mono'; }
+  .thread .chip { display: inline-block; margin-top: 8px; padding: 3px 8px; border-radius: 4px; background: var(--agent-soft); color: var(--agent-ink); font: 500 11px 'JetBrains Mono'; }
+  .thread .q { margin-top: 8px; font-size: 14px; line-height: 1.4; color: var(--ink2); }
+</style>
+</head>
+<body>
+<div class="card">
+  <div>
+    <div class="brand"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M10 5H5v22h5M22 5h5v22h-5" stroke-linecap="square"/><path d="M9.5 11l2.8 10 3.7-7.5 3.7 7.5 2.8-10" stroke-linecap="round" stroke-linejoin="round"/></svg>Wireframe</div>
+    <div class="eyebrow">LoFi prototyping · for Claude Code</div>
+    <h1>Don’t write the spec.<br>Wireframe it.</h1>
+    <p>A clickable prototype with seeded users. Comment on anything and Claude changes it.</p>
+    <div class="cmd"><b>/wireframe</b> an expense approval tool</div>
+  </div>
+  <div class="mock">
+    <div class="chrome"><i></i><i></i><i></i><span>localhost:4321/approvals.html</span></div>
+    <div class="scr">
+      <div class="side"><div class="bar" style="width:70%"></div><div class="bar"></div><div class="bar on"></div><div class="bar" style="width:80%"></div></div>
+      <div class="main">
+        <div class="head"><b>Approvals</b><div style="display:flex;gap:8px"><span class="btn">Reject</span><span class="btn dk">Approve 2</span></div></div>
+        <div class="row"><span class="box"></span><span class="t" style="width:70%"></span><span class="n"></span></div>
+        <div class="row c"><span class="box"></span><span class="t" style="width:85%"></span><span class="n"></span></div>
+        <div class="row"><span class="box"></span><span class="t" style="width:60%"></span><span class="n"></span></div>
+        <div class="row"><span class="box"></span><span class="t" style="width:75%"></span><span class="n"></span></div>
+        <div class="row"><span class="box"></span><span class="t" style="width:50%"></span><span class="n"></span></div>
+      </div>
+    </div>
+    <span class="pin">3</span>
+    <div class="thread">
+      <div class="top"><span>#3</span><span class="st">● Agent working</span></div>
+      <span class="chip">as Alex · approver</span>
+      <div class="q">Let me approve over-policy rows with a note instead of blocking.</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
