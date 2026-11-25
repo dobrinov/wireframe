@@ -22,6 +22,9 @@ Don't add a user who looks the same as another. If two users would show the same
 - Seed data is realistic, specific to the domain and internally consistent: totals add up, dates are recent (relative to today), and ids referenced across collections exist.
 - Use plausible names from a mix of backgrounds and keep the `@demo.wf` emails. Never use real people or companies.
 
+## Shared or private data
+If users in different roles act on the same records (approval flows, hand-offs), use a **shared world**: `"world": "shared"` in users.json, with all data in `seed/shared.json` (see PATTERNS.md). Otherwise each user gets their own copy of their seed.
+
 ## seed/users.json
 ```json
 {

@@ -103,3 +103,33 @@ Put the fields you branch on (`role`, `plan`, `permissions`, `limits`…) into e
 
 ## Sign-in and onboarding screens
 The harness already handles who the user is (press U). Add a sign-in screen only if the product's own sign-in flow is part of what is being designed. It can just `wf.go('/')` on submit.
+
+## Shared world (multi-role workflows)
+By default every seeded user has a private copy of their seed data. When people in different roles act on the same records (an accountant drafts, an owner approves, the bank reviews), put `"world": "shared"` at the top of `seed/users.json` and keep all data in `seed/shared.json`:
+```json
+{ "world": "shared", "users": [ … ] }
+```
+- Every user reads and writes **one** copy.
+- Switching user (U) keeps what the previous user did.
+- "Reset data" in the toolbar resets the whole world.
+- Each user's seed file is ignored. Give users the fields screens branch on instead (`kind`, `companyId`, `memberId`…).
+
+Changes made in one tab or iframe show up live in every other open page, because the store syncs through `storage` events.
+
+## Embedded apps (iframes inside a host app)
+To prototype a new app embedded in an existing one:
+- Put the host pages in `screens/`.
+- Put the embedded app in `screens/<app>/` (e.g. `screens/features/`).
+- The host loads it with `<iframe src="/features/x.html">`.
+
+Both are served from one origin, so they share the signed-in user and the store. Still talk through `postMessage`, so the integration contract is designed and visible.
+
+The harness handles iframes:
+- Only the top window shows the toolbar and the user switcher.
+- Comment mode follows the top window, so you can click inside an iframe and comment on it.
+- U pressed inside a frame opens the switcher in the top window.
+- Comments record the embedded screen and the host page (“… (embedded in /requests.html)”).
+
+Make the host size inline iframes to their content: the embedded page posts its `document.documentElement.scrollHeight` through a `ResizeObserver`.
+
+Show the iframe boundary in the wireframe, e.g. a dashed frame with a mono label, so reviewers see what is new and what is legacy. `~/Wireframes/proflow-bank` is a worked example. It has a legacy bank with embedded Requests, an Assistant and a Notification center.

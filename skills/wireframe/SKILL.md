@@ -48,7 +48,7 @@ If there are no arguments and you are not inside a prototype, list `~/Wireframes
 2. **Read the references before writing any screen**, once per session: `KIT/skills/wireframe/reference/STYLE.md`, `COMPONENTS.md`, `PATTERNS.md`, `PERSONAS.md`.
 3. **Create:** `wf new "<short name>" --json`. Work inside the folder it prints, at `~/Wireframes/<slug>`.
 4. **Plan in WIREFRAME.md:** brief, assumptions, 4–8 screens for v1 (one HTML file each), the data model (collections and fields), seeded users and why each exists, and open questions. Keep v1 small and end to end. One flow that works beats ten dead screens.
-5. **Seed users and data** per PERSONAS.md: `seed/users.json` plus one `seed/<id>.json` per user (and `seed/shared.json` for data everyone sees). Make the data realistic, internally consistent, and specific to the domain. Each user's `stats` must match their seed.
+5. **Seed users and data** per PERSONAS.md. If roles act on the same records (approvals, hand-offs), use a shared world. If the brief is a new app embedded in an existing one, follow “Embedded apps” in PATTERNS.md. `seed/users.json` plus one `seed/<id>.json` per user (and `seed/shared.json` for data everyone sees). Make the data realistic, internally consistent, and specific to the domain. Each user's `stats` must match their seed.
 6. **Build screens** in `screens/`, following PATTERNS.md:
    - Every screen links `/_wf/wf.css` and `/_wf/wf.js`, uses `<body class="wf">` and the same shell (`wf-app` + `wf-sidebar` or `wf-topbar`), and every nav link goes somewhere real.
    - Read and write data only through `wf.store`, so create, edit, delete, filter and empty states really work for each seeded user.

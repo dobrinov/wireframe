@@ -77,18 +77,30 @@ export function loadUsers(root) {
   }));
 }
 
+// A project is either "per-user" (default: every seeded user has a private copy of
+// their own seed) or a shared world ({"world": "shared"} in users.json): every user
+// sees and changes the same data, so multi-role workflows (draft → approve) work.
+export function worldMode(root) {
+  const raw = readJSON(paths(root).users, {});
+  return !Array.isArray(raw) && raw.world === 'shared' ? 'shared' : 'per-user';
+}
+
 export function loadSeed(root, userId) {
   const user = loadUsers(root).find((u) => u.id === userId);
   if (!user) return null;
   const p = paths(root);
-  const shared = readJSON(path.join(p.seed, 'shared.json'), {});
+  const sharedFile = path.join(p.seed, 'shared.json');
+  const shared = readJSON(sharedFile, {});
+  const mtime = (f) => (fs.existsSync(f) ? fs.statSync(f).mtimeMs : 0);
+  if (worldMode(root) === 'shared') {
+    return { user, data: shared.data || shared, version: `${mtime(sharedFile)}-${mtime(p.users)}`, shared: true };
+  }
   const file = user.seed ? path.resolve(root, user.seed) : path.join(p.seed, `${userId}.json`);
   if (!file.startsWith(p.seed + path.sep)) throw new Error(`seed for ${userId} must live in seed/`);
   const own = readJSON(file, {});
   const data = { ...(shared.data || shared), ...(own.data || own) };
-  const files = [path.join(p.seed, 'shared.json'), file, p.users];
-  const version = files.map((f) => (fs.existsSync(f) ? fs.statSync(f).mtimeMs : 0)).join('-');
-  return { user, data, version };
+  const version = [sharedFile, file, p.users].map(mtime).join('-');
+  return { user, data, version, shared: false };
 }
 
 function initials(name) {

@@ -68,3 +68,18 @@ test('lint flags off-style screens and passes the example', () => {
   for (const r of ['raw-colour', 'blur-shadow', 'gradient', 'unknown-component']) assert.ok(rules.has(r), r);
   assert.deepEqual(lint(path.resolve('examples/expense-approvals')), []);
 });
+
+test('shared world: every user gets the same shared data and a shared flag', () => {
+  const root = newProject();
+  const users = JSON.parse(fs.readFileSync(paths(root).users));
+  users.world = 'shared';
+  fs.writeFileSync(paths(root).users, JSON.stringify(users));
+  fs.writeFileSync(path.join(root, 'seed/shared.json'), JSON.stringify({ data: { requests: [{ id: 'r1' }] } }));
+  fs.writeFileSync(path.join(root, 'seed/empty.json'), JSON.stringify({ data: { ignored: [1] } }));
+  const a = loadSeed(root, 'empty');
+  const b = loadSeed(root, 'power');
+  assert.equal(a.shared, true);
+  assert.deepEqual(a.data, b.data);
+  assert.equal(a.version, b.version);
+  assert.ok(!('ignored' in a.data));
+});
