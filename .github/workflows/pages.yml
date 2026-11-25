@@ -3,7 +3,7 @@ name: Publish site
 on:
   push:
     branches: [main]
-    paths: ['site/**', 'lib/**', 'scripts/build-site.js', '.github/workflows/pages.yml']
+    paths: ['site/**', 'lib/**', 'scripts/build-site.js', 'package.json', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:
