@@ -144,7 +144,7 @@ wf-nav-group { display: block; padding: var(--wf-s-4) 10px 4px; font: 500 11px v
 wf-nav-item { display: block; }
 wf-nav-item a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--wf-r-sm); text-decoration: none; font-size: 14px; color: var(--wf-ink); }
 wf-nav-item a:hover { background: var(--wf-fill); }
-wf-nav-item[active] a, wf-nav-item a[aria-current="page"] { background: var(--wf-ink); color: var(--wf-on-ink); font-weight: 600; }
+wf-nav-item[active] a, wf-nav-item a[aria-current="page"], wf-nav-item a[aria-current="location"] { background: var(--wf-ink); color: var(--wf-on-ink); font-weight: 600; }
 wf-nav-item .wf-x-count { margin-left: auto; font-size: 11px; border: var(--wf-stroke-thin) solid currentColor; border-radius: var(--wf-r-pill); padding: 0 7px; }
 wf-topbar { display: flex; align-items: center; gap: var(--wf-s-3); min-height: 56px; padding: 0 var(--wf-s-6); background: var(--wf-surface); border-bottom: var(--wf-stroke) solid var(--wf-ink); flex-wrap: wrap; }
 wf-topbar[variant="marketing"] { gap: var(--wf-s-6); }

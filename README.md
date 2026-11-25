@@ -6,6 +6,8 @@ Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cas
 /wireframe an expense approval tool for small finance teams
 ```
 
+**Website and live component library:** https://dobrinov.github.io/wireframe/
+
 ## What's inside
 
 | Part | Where | What it does |
@@ -13,19 +15,20 @@ Type `/wireframe` and a one-line brief. Claude plans the screens, data and a cas
 | `/wireframe` skill | `skills/wireframe/` | The workflow Claude follows: setup, plan, seed users, build, run, listen for comments, iterate, revise users |
 | Component library | `lib/wf.css`, `lib/wf.js` | ~70 greyscale components as plain web components, plus a mock data store and helpers. No build step |
 | Style rules | `skills/wireframe/reference/STYLE.md` | Tokens, states, anatomy, and a recipe so new components match the existing ones |
-| Harness | `lib/harness.js` | Injected into every prototype: user switcher (U), comment mode (C), pins and threads, agent status, live reload |
+| Harness | `lib/harness.js` | Injected into every prototype: user switcher (U), comment mode (C), threads panel (T), pins, live agent activity, live reload |
 | `wf` helper | `bin/wf.js`, `src/` | Zero-dependency Node CLI: local server, comment inbox, agent bridge, lint, doctor, setup |
 | Installer | `install/bootstrap.sh`, `install/bootstrap.ps1` | For computers without Node: installs a private runtime in `~/.wireframe/runtime`, no admin rights needed |
 | Example | `examples/expense-approvals/` | Six screens, six seeded users, the reference prototype |
+| Website | `site/`, `scripts/build-site.js` | The marketing page plus the live library, published to GitHub Pages by `.github/workflows/pages.yml`. Preview with `node scripts/build-site.js` and open `_site/index.html` |
 
 ## Install
 
 1. In Claude Code:
    ```
-   /plugin marketplace add /path/to/this/folder
+   /plugin marketplace add dobrinov/wireframe
    /plugin install wireframe@wireframe-kit
    ```
-   (Or `/plugin marketplace add <github-owner>/<repo>` once it is pushed.)
+   (Working on the kit itself? Use `/plugin marketplace add /path/to/this/folder` instead.)
 2. Type `/wireframe setup`. Claude checks the computer, installs what's missing (asking first), and creates `~/Wireframes`. Nobody needs to touch a terminal.
 
 Already have Node 18+? `node bin/wf.js setup` does the same from a shell.

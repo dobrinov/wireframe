@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe Kit · agentic LoFi wireframing for Claude Code</title>
+<meta name="description" content="Type /wireframe and a one-line brief. Claude builds a working LoFi prototype with seeded test users, then picks up the comments you leave on it.">
+<meta property="og:title" content="Wireframe Kit · agentic LoFi wireframing for Claude Code">
+<meta property="og:description" content="Describe it in one line. Click through it a minute later. Comment on anything and the agent fixes it while you watch.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1C1C1A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231C1C1A'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='13' font-weight='700' fill='white' text-anchor='middle'%3Ewf%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="logo" aria-hidden="true">wf</span><b>Wireframe Kit</b></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#how">How it works</a><a href="#users">Seeded users</a><a href="#comments">Comments</a><a href="#library">Library</a><a href="#install">Install</a>
+    </nav>
+    <div class="actions">
+      <a class="btn sec gh" href="https://github.com/dobrinov/wireframe">GitHub</a>
+      <a class="btn pri" href="#install">Install</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<section id="top" class="wrap hero">
+  <div class="hero-head">
+    <span class="eyebrow">Agentic wireframing · for Claude Code</span>
+    <h1>Describe it in one line.<br>Click through it a minute later.</h1>
+  </div>
+  <div class="hero-row">
+    <div class="hero-copy">
+      <p class="lead">Type <span class="kbd">/wireframe</span> and a brief. Claude plans the screens, the data and a cast of test users, then builds a working LoFi prototype you can sign into, click through and comment on. Your comments go straight back to the agent, and you watch it work.</p>
+      <div class="ctas">
+        <a class="btn pri" href="#install">Get started</a>
+        <a class="btn sec" href="library/">Browse the component library →</a>
+      </div>
+    </div>
+    <div class="hero-term">
+<pre class="code" aria-label="Example session"><span class="p">›</span> /wireframe an expense approval tool for small finance teams
+<span class="d">  ◇ Planning 6 screens · 3 collections · 6 users</span>
+<span class="d">  ◇ Seeding: empty, submitter, approver, admin, trial, viewer</span>
+<span class="d">  ◇ Building with the wf library · lint passed</span>
+<span class="ok">  ✓ Running at http://localhost:4321</span>
+<span class="d">  ◇ Listening for comments…</span></pre>
+    </div>
+  </div>
+
+  <figure class="card mock" style="margin:0" aria-label="A prototype with a comment the agent is working on">
+    <div class="chrome" aria-hidden="true"><i></i><i></i><i></i><span class="url">localhost:4321/approvals.html</span></div>
+    <div class="screen">
+      <div class="side" aria-hidden="true">
+        <div class="b"><span class="blk"></span>Ledgerline</div>
+        <div class="i">Dashboard</div><div class="i">My expenses</div>
+        <div class="i on">Approvals<span>9</span></div><div class="i">Billing</div>
+      </div>
+      <div class="main">
+        <div class="head"><b>Approvals</b><div style="display:flex;gap:8px"><span class="pill-btn">Reject</span><span class="pill-btn dark">Approve 2</span></div></div>
+        <div class="soft tbl" role="table" aria-label="Expenses waiting for approval">
+          <div class="tr th" role="row"><span></span><span>Submitted by</span><span>Merchant</span><span>Policy</span><span class="r">Amount</span></div>
+          <div class="tr sel" role="row"><span class="box on"></span><span>Sam Okafor</span><span>Coastline Rail</span><span><span class="badge">OK</span></span><span class="r">€184.20</span></div>
+          <div class="tr cmt" role="row"><span class="box on"></span><span>Tomi Lindqvist</span><span>Harbour Hotel</span><span><span class="badge dash">Over €150/night</span></span><span class="r">€488.00</span></div>
+          <div class="tr" role="row"><span class="box"></span><span>Lena Park</span><span>Stack Software</span><span><span class="badge">OK</span></span><span class="r">€49.00</span></div>
+          <div class="tr" role="row"><span class="box"></span><span>Jon Abbe</span><span>Cab Co.</span><span><span class="badge">OK</span></span><span class="r">€32.50</span></div>
+        </div>
+      </div>
+      <span class="pin" style="left:calc(200px + 40%);top:152px" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/></svg></span>
+      <div class="thread">
+        <div class="row"><b>#3</b><span class="st">Agent working</span></div>
+        <div class="row"><span class="chip" style="background:var(--agent-soft);color:var(--agent-ink)">as Alex Reyes · approver</span><span class="chip" style="background:var(--fill);color:var(--ink2)">tr “Harbour Hotel”</span></div>
+        <p>Let me approve over-policy rows with a note instead of blocking.</p>
+        <div class="act" role="status">
+          <div class="ah"><span class="spin" aria-hidden="true"></span>Claude Code is working on this<span class="t">0:41</span></div>
+          <div class="where"><b>Claude Code session</b> · in ~/Wireframes/expense-approvals</div>
+          <ol>
+            <li><span>10:42:03</span>Reading screens/approvals.html</li>
+            <li><span>10:42:09</span>Adding “Approve with note” to over-policy rows</li>
+            <li><span>10:42:31</span>Saved screens/approvals.html</li>
+          </ol>
+        </div>
+      </div>
+      <div class="toolbar" aria-hidden="true">
+        <span class="u"><span class="av">AR</span>Alex · Manager ▾</span>
+        <span class="opt">Browse</span>
+        <span>Comment</span>
+        <span class="opt">Threads <span class="cnt">1</span></span>
+        <span class="busy"><span class="spin"></span>Agent working on #3</span>
+      </div>
+    </div>
+  </figure>
+</section>
+
+<section id="how" class="band">
+  <div class="wrap pad stack">
+    <div class="intro"><span class="eyebrow">How it works</span><h2>One loop: brief, build, poke at it, refine.</h2></div>
+    <div class="grid">
+      <div class="card step"><span class="num">01 · Brief</span><h3>/wireframe &lt;what you want&gt;</h3><p>A sentence is enough. If the brief is truly ambiguous, Claude asks one round of short questions. Otherwise it decides and writes its assumptions down.</p></div>
+      <div class="card step"><span class="num">02 · Plan</span><h3>Screens, data, people</h3><p>A WIREFRAME.md file records the screen map, the data model, the seeded users and the open questions. It is the agent’s memory, so you can come back next week.</p></div>
+      <div class="card step"><span class="num">03 · Build &amp; run</span><h3>Working, not pictures</h3><p>Plain HTML built from the wf library. Forms save, lists filter, permissions apply and every screen has its empty state. It runs on your own computer.</p></div>
+      <div class="card step agent"><span class="num">04 · Iterate</span><h3>Prompt or comment</h3><p>Tell Claude in the terminal, or press C and click anything in the prototype. The page reloads by itself when the change lands.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="users" class="wrap pad split">
+  <div class="stack" style="gap:20px">
+    <span class="eyebrow">Seeded users</span>
+    <h2>Every prototype comes with the people who break it.</h2>
+    <p class="lead">Claude picks a cast for each project: someone with no data, someone with everything, one person per role and plan, and the edge cases your brief hints at. Press <b>U</b> to sign in as any of them. Each one shows a different state of the product.</p>
+    <div class="checks">
+      <div class="check"><span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Each user says <b>why it exists</b> and what to test with it.</span></div>
+      <div class="check"><span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>Realistic data whose numbers add up. For approvals and hand-offs, users <b>share one world</b>: what the accountant submits is waiting when you switch to the owner.</span></div>
+      <div class="check"><span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span>The cast <b>evolves</b>: add billing and a “trial expired” user appears, with a note saying why.</span></div>
+    </div>
+  </div>
+  <div class="card users" aria-label="Example user switcher">
+    <div class="hd"><b>Who do you want to be?</b><span class="mono" style="font-size:12px;color:var(--muted)">6 users</span></div>
+    <div class="uc"><span class="av">EN</span><span class="who"><b>Elif Novak</b><span>Brand-new account, zero data</span></span><span class="chip">empty</span></div>
+    <div class="uc"><span class="av">SO</span><span class="who"><b>Sam Okafor</b><span>Everyday submitter, mixed statuses</span></span><span class="chip">submitter</span></div>
+    <div class="uc sel"><span class="av">AR</span><span class="who"><b>Alex Reyes</b><span>Manager with a full approval queue</span></span><span class="chip">approver</span></div>
+    <div class="uc"><span class="av">PW</span><span class="who"><b>Priya Walsh</b><span>Every feature on, lots of data</span></span><span class="chip">power</span></div>
+    <div class="uc"><span class="av">TM</span><span class="who"><b>Tomás Meyer</b><span>Trial ended, read-only · added in v3</span></span><span class="chip">trial-expired</span></div>
+  </div>
+</section>
+
+<section id="comments" class="band dark">
+  <div class="wrap pad stack" style="gap:40px">
+    <div class="split" style="gap:40px;align-items:flex-end">
+      <div class="stack" style="gap:18px"><span class="eyebrow">Comments that reach the agent</span><h2>Point at the problem. Tick a box. Watch it get fixed.</h2></div>
+      <p class="lead">Every comment carries the screen, the exact element you clicked and the user you were signed in as, so the agent sees what you saw. While it works, the comment shows who picked it up, where, and each step as it happens.</p>
+    </div>
+    <div class="flow">
+      <div><span class="k" style="color:var(--cmt-light)">1 · In the browser</span><b>Press C, click, write</b><span>The cursor turns into a speech bubble. Tick “Send to coding agent” and an orange pin marks the spot.</span></div>
+      <div><span class="k">2 · On your computer</span><b>The wf helper queues it</b><span>Every comment is saved with the project. Ticked ones go to the agent’s inbox.</span></div>
+      <div style="border-color:var(--agent-light)"><span class="k" style="color:var(--agent-light)">3 · Live, on the comment</span><b>Watch the agent work</b><span>Your /wireframe session picks it up. If none is open, a short background run does. Either way, the steps stream onto the comment.</span></div>
+      <div><span class="k" style="color:var(--ok)">4 · Back on screen</span><b>Reload, reply, resolved</b><span>The page refreshes, the agent replies and the pin resolves. Every thread stays under Threads (T).</span></div>
+    </div>
+<pre class="code" style="background:#2A2A27;font-size:13px">── Comment #3 · working ─────────────────────────
+Screen:    screens/approvals.html
+Element:   #rows &gt; tr[data-id="exp_5"]  “Harbour Hotel”
+Viewed as: Alex Reyes (approver, Manager · Sales)
+
+Let me approve over-policy rows with a note instead of blocking.
+<span class="d">› wf progress 3 "Adding ‘Approve with note’ to over-policy rows"</span>
+<span class="ok">✓ wf reply 3 "Added ‘Approve with note’ to over-policy rows" --resolve</span></pre>
+  </div>
+</section>
+
+<section class="wrap pad stack">
+  <div class="intro"><span class="eyebrow">Made for real product questions</span><h2>From a blank idea to a feature inside an existing product.</h2></div>
+  <div class="grid">
+    <div class="card feat"><span class="k">Shared world</span><h3>Multi-role flows that actually flow</h3><p>A request drafted by an accountant, approved by the owner and reviewed by the bank: switch users and the same record moves through every step.</p></div>
+    <div class="card feat"><span class="k">Embedded apps</span><h3>Prototype inside what you already have</h3><p>Mock the existing product as a host and load the new feature in an iframe, with a visible boundary and a log of every message between them.</p></div>
+    <div class="card feat"><span class="k">Threads</span><h3>Every decision, kept</h3><p>All comments with their full replies and the agent’s work log. Search them, filter them, and jump to the exact spot on screen.</p></div>
+    <div class="card feat"><span class="k">Hand-off</span><h3>A spec you can hand over</h3><p>WIREFRAME.md holds the brief, assumptions, screens, data model, users, open questions and a changelog of every iteration.</p></div>
+  </div>
+</section>
+
+<section id="library" class="band">
+  <div class="wrap pad stack">
+    <div class="split" style="gap:32px;align-items:flex-end">
+      <div class="stack" style="gap:18px">
+        <span class="eyebrow">The wf component library</span>
+        <h2>Deliberately plain, so feedback is about the idea and not the look.</h2>
+        <p class="lead">Around 70 components for layout, inputs, navigation, data display and overlays. All greyscale and usable from the keyboard. Strict style rules mean new components, yours or the agent’s, look like they always belonged.</p>
+      </div>
+      <div style="flex:0 1 auto"><a class="btn pri" href="library/">Browse every component →</a></div>
+    </div>
+    <div class="grid" aria-hidden="true">
+      <div class="soft lib"><span class="k">Inputs</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill-btn dark">Save</span><span class="pill-btn">Cancel</span><span class="pill-btn" style="border-style:dashed">Delete</span></div>
+        <div class="field">Email<i></i></div></div>
+      <div class="soft lib"><span class="k">Navigation</span>
+        <div class="tabs"><span class="on">Waiting 9</span><span>Over policy 2</span></div>
+        <div class="stepper"><span class="d done">✓</span><span class="l"></span><span class="d cur">2</span><span class="l off"></span><span class="d next">3</span></div></div>
+      <div class="soft lib"><span class="k">Data display</span>
+        <div class="chart"><i style="height:40%"></i><i style="height:70%"></i><i style="height:55%"></i><i class="hi" style="height:95%"></i><i style="height:65%"></i></div>
+        <div style="display:flex;gap:6px"><span class="badge">Pending</span><span class="badge" style="background:var(--ink);color:var(--white)">Paid</span><span class="badge dash">Overdue</span></div></div>
+      <div class="soft lib"><span class="k">Feedback &amp; overlays</span>
+        <div class="dlg"><b style="font-size:14px">Reject 3 expenses?</b><div class="bar" style="width:85%"></div><div style="display:flex;gap:6px;justify-content:flex-end"><span class="pill-btn" style="padding:3px 10px;font-size:12px">Cancel</span><span class="pill-btn dark" style="padding:3px 10px;font-size:12px">Reject</span></div></div></div>
+    </div>
+    <div class="grid">
+      <div class="card feat"><h3>Greyscale only</h3><p>Blue is reserved for the agent and orange for comments, so feedback never blends into the design.</p></div>
+      <div class="card feat"><h3>8 states, drawn one way</h3><p>Default, hover, focus, selected, disabled, error, loading and empty are told apart by fill, stroke and dashes, never by colour.</p></div>
+      <div class="card feat"><h3>wf lint</h3><p>Catches raw colours, blurred shadows, gradients, emoji and unknown components before you ever see them.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap pad split" style="align-items:flex-start">
+  <div class="stack" style="gap:18px">
+    <span class="eyebrow">Built for people who don’t live in a terminal</span>
+    <h2>Nothing to install but one small helper.</h2>
+    <p class="lead">No npm installs, build tools or databases. Prototypes are plain HTML files in a folder. If your computer is missing anything, Claude explains it in one sentence and sets it up after you say yes.</p>
+  </div>
+  <div class="setup">
+    <div class="soft"><span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><div><b>Claude Code</b><span>Where you type /wireframe</span></div></div>
+    <div class="soft now"><span class="n">2</span><div><b>The wf helper</b><span>Runs prototypes on this computer. Brings its own runtime if needed, with no admin rights.</span></div></div>
+    <div class="soft"><span class="n">3</span><div><b>A Wireframes folder</b><span>Each prototype gets its own folder you can zip and share</span></div></div>
+    <div class="soft"><span class="n">4</span><div><b>Your first brief</b><span>Switch users and leave your first comment</span></div></div>
+  </div>
+</section>
+
+<section id="install" class="band">
+  <div class="wrap pad stack" style="gap:32px">
+    <div class="intro"><span class="eyebrow">Install</span><h2>Three lines in Claude Code.</h2></div>
+    <div class="install">
+      <div><span class="num">1 · Add the plugin source</span><pre class="code"><span class="p">›</span> <span data-copy>/plugin marketplace add dobrinov/wireframe</span></pre></div>
+      <div><span class="num">2 · Install it</span><pre class="code"><span class="p">›</span> <span data-copy>/plugin install wireframe@wireframe-kit</span></pre></div>
+      <div><span class="num">3 · Let Claude set up the rest</span><pre class="code"><span class="p">›</span> <span data-copy>/wireframe setup</span></pre></div>
+    </div>
+    <div class="soft cmds">
+      <div><span class="mono"><b>/wireframe</b> &lt;brief&gt;</span><span>Start a new prototype in ~/Wireframes</span></div>
+      <div><span class="mono"><b>/wireframe</b> open &lt;name&gt;</span><span>Pick up an earlier one</span></div>
+      <div><span class="mono"><b>/wireframe</b> users</span><span>Review and revise the seeded users</span></div>
+      <div><span class="mono"><b>/wireframe</b> doctor</span><span>Check and fix the setup in plain language</span></div>
+      <div><span class="mono"><b>U</b> · <b>C</b> · <b>T</b> · <b>H</b></span><span>In the prototype: switch user, comment, threads, hide toolbar</span></div>
+      <div><span class="mono"><b>wf library</b></span><span>Open the live component gallery</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap pad split" style="align-items:flex-start;gap:48px">
+  <div class="stack" style="gap:14px;flex:1 1 300px"><span class="eyebrow">Questions</span><h2>Good to know</h2></div>
+  <div style="flex:2 1 520px">
+    <div class="faq"><b>Does anything leave my computer?</b><p>The prototype and the comment helper run only on your machine and accept local connections only. The agent is your normal Claude Code session.</p></div>
+    <div class="faq"><b>Why is everything grey?</b><p>LoFi keeps the conversation on flows, content and states. When you’re ready for visual design, the screens and WIREFRAME.md make a clear spec.</p></div>
+    <div class="faq"><b>What if no Claude Code session is open?</b><p>Comments you send wait in the project’s inbox. After about 20 seconds the helper can start a short background run, limited to editing the prototype, and you can follow its steps on the comment. You can switch that off per project.</p></div>
+    <div class="faq"><b>Can I add my own components?</b><p>Yes. Follow the style recipe (tokens only, all eight states, real HTML underneath) and run wf lint. The agent uses the same recipe.</p></div>
+    <div class="faq"><b>Which computers does it run on?</b><p>Mac, Linux and Windows. Installers for all three are included and bring their own runtime when needed.</p></div>
+  </div>
+</section>
+</main>
+
+<footer class="band dark">
+  <div class="wrap pad cta">
+    <h2>What would you sketch first?</h2>
+    <div class="ctas">
+      <a class="btn inv" href="#install">Install for Claude Code</a>
+      <a class="btn ghost-inv" href="library/">Browse the library</a>
+    </div>
+  </div>
+  <div class="wrap foot">
+    <span class="mono">wf · Wireframe Kit</span>
+    <a href="https://github.com/dobrinov/wireframe">Source on GitHub</a>
+    <a href="https://github.com/dobrinov/wireframe/blob/main/LICENSE">MIT licensed</a>
+    <span class="r">A plugin for Claude Code</span>
+  </div>
+</footer>
+
+<script>
+  // Copy buttons for the install commands.
+  document.querySelectorAll('[data-copy]').forEach((el) => {
+    const b = document.createElement('button');
+    b.className = 'copy'; b.type = 'button'; b.textContent = 'Copy';
+    b.setAttribute('aria-label', `Copy: ${el.textContent}`);
+    b.onclick = async () => {
+      try { await navigator.clipboard.writeText(el.textContent); b.textContent = 'Copied'; }
+      catch { b.textContent = 'Select & copy'; }
+      setTimeout(() => { b.textContent = 'Copy'; }, 1600);
+    };
+    el.closest('pre').appendChild(b);
+  });
+</script>
+</body>
+</html>
