@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wireframe · agentic LoFi wireframing for Claude Code</title>
-<meta name="description" content="Type /wireframe and a one-line brief. Claude builds a working LoFi prototype with seeded test users, then picks up the comments you leave on it.">
-<meta property="og:title" content="Wireframe · agentic LoFi wireframing for Claude Code">
-<meta property="og:description" content="Describe it in one line. Click through it a minute later. Comment on anything and the agent fixes it while you watch.">
+<title>Wireframe · LoFi prototypes instead of specs, for Claude Code</title>
+<meta name="description" content="Stop writing specs nobody reads. Wireframe the idea instead: Claude builds a clickable LoFi prototype, you iterate cheaply with comments, then turn the agreed wireframe into a written spec and HiFi screens.">
+<meta property="og:title" content="Wireframe · don’t write the spec, wireframe it">
+<meta property="og:description" content="A clickable LoFi prototype explains an idea better than pages of requirements, and it is cheap to change. When everyone agrees, turn it into the spec and HiFi screens.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#1C1C1A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F7F6F2'/%3E%3Cg fill='none' stroke='%231C1C1A' stroke-width='2.6'%3E%3Cpath d='M10 5H5v22h5M22 5h5v22h-5' stroke-linecap='square'/%3E%3Cpath d='M9.5 11l2.8 10 3.7-7.5 3.7 7.5 2.8-10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E">
@@ -22,7 +22,7 @@
   <div class="wrap">
     <a class="brand" href="#top"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M10 5H5v22h5M22 5h5v22h-5" stroke-linecap="square"/><path d="M9.5 11l2.8 10 3.7-7.5 3.7 7.5 2.8-10" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Wireframe</b></a>
     <nav class="nav" aria-label="Main">
-      <a href="#how">How it works</a><a href="#users">Seeded users</a><a href="#comments">Comments</a><a href="#library">Library</a><a href="#install">Install</a>
+      <a href="#why">Why</a><a href="#how">How it works</a><a href="#users">Seeded users</a><a href="#comments">Comments</a><a href="#library">Library</a><a href="#install">Install</a>
     </nav>
     <div class="actions">
       <a class="btn sec gh" href="https://github.com/dobrinov/wireframe">GitHub</a>
@@ -34,12 +34,12 @@
 <main id="main">
 <section id="top" class="wrap hero">
   <div class="hero-head">
-    <span class="eyebrow">Agentic wireframing · for Claude Code</span>
-    <h1>Describe it in one line.<br>Click through it a minute later.</h1>
+    <span class="eyebrow">LoFi prototyping · for Claude Code</span>
+    <h1>Don’t write the spec.<br>Wireframe it.</h1>
   </div>
   <div class="hero-row">
     <div class="hero-copy">
-      <p class="lead">Type <span class="kbd">/wireframe</span> and a brief. Claude plans the screens, the data and a cast of test users, then builds a working LoFi prototype you can sign into, click through and comment on. Your comments go straight back to the agent, and you watch it work.</p>
+      <p class="lead">A clickable wireframe explains an idea better than pages of requirements, and changing it is cheap. Type <span class="kbd">/wireframe</span> and a brief: Claude builds a working LoFi prototype with test users you can sign in as. Iterate with comments until everyone agrees, then turn it into a written spec and HiFi screens.</p>
       <div class="ctas">
         <a class="btn pri" href="#install">Get started</a>
         <a class="btn sec" href="library/">Browse the component library →</a>
@@ -99,14 +99,23 @@
   </figure>
 </section>
 
+<section id="why" class="wrap pad stack">
+  <div class="intro"><span class="eyebrow">Why wireframes, not specs</span><h2>Agree on the idea while it’s still cheap to change.</h2></div>
+  <div class="grid">
+    <div class="card feat"><span class="k">Communicate</span><h3>Everyone clicks the same thing</h3><p>A spec is read ten different ways. A working wireframe shows the flow, the states and the edge cases, so product, design, engineering and customers react to the same idea.</p></div>
+    <div class="card feat"><span class="k">Iterate cheaply</span><h3>Change it in a minute, not a sprint</h3><p>Point at a problem and the agent changes it while you watch. It is grey on purpose, so feedback is about what the product does, not how it looks.</p></div>
+    <div class="card feat"><span class="k">Then write it down</span><h3>Spec and HiFi come last</h3><p>When the wireframe is agreed, turn it into a written specification and use it as the brief for HiFi screens. The hard questions are already answered.</p></div>
+  </div>
+</section>
+
 <section id="how" class="band">
   <div class="wrap pad stack">
-    <div class="intro"><span class="eyebrow">How it works</span><h2>One loop: brief, build, poke at it, refine.</h2></div>
+    <div class="intro"><span class="eyebrow">How it works</span><h2>From a brief to an agreed wireframe to a spec.</h2></div>
     <div class="grid">
       <div class="card step"><span class="num">01 · Brief</span><h3>/wireframe &lt;what you want&gt;</h3><p>A sentence is enough. If the brief is truly ambiguous, Claude asks one round of short questions. Otherwise it decides and writes its assumptions down.</p></div>
-      <div class="card step"><span class="num">02 · Plan</span><h3>Screens, data, people</h3><p>A WIREFRAME.md file records the screen map, the data model, the seeded users and the open questions. It is the agent’s memory, so you can come back next week.</p></div>
-      <div class="card step"><span class="num">03 · Build &amp; run</span><h3>Working, not pictures</h3><p>Plain HTML built from the wf library. Forms save, lists filter, permissions apply and every screen has its empty state. It runs on your own computer.</p></div>
-      <div class="card step agent"><span class="num">04 · Iterate</span><h3>Prompt or comment</h3><p>Tell Claude in the terminal, or press C and click anything in the prototype. The page reloads by itself when the change lands.</p></div>
+      <div class="card step"><span class="num">02 · Build</span><h3>Working, not pictures</h3><p>Claude plans the screens, the data and the test users, then builds them from the wf library. Forms save, lists filter, permissions apply and every screen has its empty state.</p></div>
+      <div class="card step agent"><span class="num">03 · Iterate</span><h3>Prompt or comment</h3><p>Share it, click through it, press C and comment on anything. The agent changes it while you watch. Repeat until everyone agrees.</p></div>
+      <div class="card step"><span class="num">04 · Hand over</span><h3>Spec and HiFi</h3><p>Ask Claude to turn the wireframe and its WIREFRAME.md into a written spec, and give designers the agreed screens as the brief for HiFi.</p></div>
     </div>
   </div>
 </section>
@@ -161,7 +170,7 @@ Let me approve over-policy rows with a note instead of blocking.
     <div class="card feat"><span class="k">Shared world</span><h3>Multi-role flows that actually flow</h3><p>A request drafted by an accountant, approved by the owner and reviewed by the bank: switch users and the same record moves through every step.</p></div>
     <div class="card feat"><span class="k">Embedded apps</span><h3>Prototype inside what you already have</h3><p>Mock the existing product as a host and load the new feature in an iframe, with a visible boundary and a log of every message between them.</p></div>
     <div class="card feat"><span class="k">Threads</span><h3>Every decision, kept</h3><p>All comments with their full replies and the agent’s work log. Search them, filter them, and jump to the exact spot on screen.</p></div>
-    <div class="card feat"><span class="k">Hand-off</span><h3>A spec you can hand over</h3><p>WIREFRAME.md holds the brief, assumptions, screens, data model, users, open questions and a changelog of every iteration.</p></div>
+    <div class="card feat"><span class="k">Hand-off</span><h3>Half the spec is already written</h3><p>WIREFRAME.md records the brief, assumptions, screens, data model, users, decisions, open questions and every change, ready to become the written spec.</p></div>
   </div>
 </section>
 
@@ -233,7 +242,7 @@ Let me approve over-policy rows with a note instead of blocking.
   <div class="stack" style="gap:14px;flex:1 1 300px"><span class="eyebrow">Questions</span><h2>Good to know</h2></div>
   <div style="flex:2 1 520px">
     <div class="faq"><b>Does anything leave my computer?</b><p>The prototype and the comment helper run only on your machine and accept local connections only. The agent is your normal Claude Code session.</p></div>
-    <div class="faq"><b>Why is everything grey?</b><p>LoFi keeps the conversation on flows, content and states. When you’re ready for visual design, the screens and WIREFRAME.md make a clear spec.</p></div>
+    <div class="faq"><b>Why is everything grey?</b><p>LoFi keeps the conversation on flows, content and states, and keeps changes cheap. Once the wireframe is agreed, it becomes the brief for HiFi design.</p></div>
     <div class="faq"><b>What if no Claude Code session is open?</b><p>Comments you send wait in the project’s inbox. After about 20 seconds the helper can start a short background run, limited to editing the prototype, and you can follow its steps on the comment. You can switch that off per project.</p></div>
     <div class="faq"><b>Can I add my own components?</b><p>Yes. Follow the style recipe (tokens only, all eight states, real HTML underneath) and run wf lint. The agent uses the same recipe.</p></div>
     <div class="faq"><b>Which computers does it run on?</b><p>Mac, Linux and Windows. Installers for all three are included and bring their own runtime when needed.</p></div>
