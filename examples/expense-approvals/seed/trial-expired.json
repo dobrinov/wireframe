@@ -1,0 +1,123 @@
+{
+  "data": {
+    "expenses": [
+      {
+        "id": "exp_1",
+        "merchant": "CloudDocs",
+        "category": "Software",
+        "amount": 87.25,
+        "date": "2026-11-23",
+        "status": "approved",
+        "by": "Inés Ruiz",
+        "byId": "u_ines",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_2",
+        "merchant": "Bistro 9",
+        "category": "Meals",
+        "amount": 80.42,
+        "date": "2026-10-19",
+        "status": "approved",
+        "by": "Tomás Meyer",
+        "byId": "u_tomas",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_3",
+        "merchant": "Coastline Rail",
+        "category": "Travel",
+        "amount": 186.8,
+        "date": "2026-11-16",
+        "status": "approved",
+        "by": "Inés Ruiz",
+        "byId": "u_ines",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_4",
+        "merchant": "Cab Co.",
+        "category": "Travel",
+        "amount": 13.98,
+        "date": "2026-11-18",
+        "status": "approved",
+        "by": "Tomás Meyer",
+        "byId": "u_tomas",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_5",
+        "merchant": "Nordic Coffee",
+        "category": "Meals",
+        "amount": 52.84,
+        "date": "2026-10-21",
+        "status": "approved",
+        "by": "Inés Ruiz",
+        "byId": "u_ines",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_6",
+        "merchant": "Bistro 9",
+        "category": "Meals",
+        "amount": 90.66,
+        "date": "2026-11-13",
+        "status": "pending",
+        "by": "Tomás Meyer",
+        "byId": "u_tomas",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_7",
+        "merchant": "CloudDocs",
+        "category": "Software",
+        "amount": 87.3,
+        "date": "2026-10-28",
+        "status": "pending",
+        "by": "Inés Ruiz",
+        "byId": "u_ines",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_8",
+        "merchant": "CloudDocs",
+        "category": "Software",
+        "amount": 82.78,
+        "date": "2026-10-23",
+        "status": "pending",
+        "by": "Tomás Meyer",
+        "byId": "u_tomas",
+        "receipt": true,
+        "overPolicy": false
+      }
+    ],
+    "team": [
+      {
+        "id": "u_tomas",
+        "name": "Tomás Meyer",
+        "role": "Owner",
+        "email": "tomas@demo.wf"
+      },
+      {
+        "id": "u_ines",
+        "name": "Inés Ruiz",
+        "role": "Submitter",
+        "email": "ines@demo.wf"
+      }
+    ],
+    "settings": {
+      "plan": "trial_expired",
+      "policyLimit": 150,
+      "currency": "EUR",
+      "company": "Ledgerline Ltd",
+      "trialEnded": "2026-11-22"
+    }
+  }
+}

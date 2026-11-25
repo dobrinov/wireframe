@@ -1,0 +1,356 @@
+{
+  "data": {
+    "expenses": [
+      {
+        "id": "exp_1",
+        "merchant": "Harbour Hotel",
+        "category": "Lodging",
+        "amount": 612,
+        "date": "2026-11-14",
+        "status": "pending",
+        "by": "Sam Okafor",
+        "byId": "u_sam",
+        "receipt": true,
+        "overPolicy": true
+      },
+      {
+        "id": "exp_2",
+        "merchant": "Paper & Co",
+        "category": "Office",
+        "amount": 83.86,
+        "date": "2026-11-17",
+        "status": "pending",
+        "by": "Lena Park",
+        "byId": "u_lena",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_3",
+        "merchant": "Coastline Rail",
+        "category": "Travel",
+        "amount": 73.78,
+        "date": "2026-11-11",
+        "status": "pending",
+        "by": "Jon Abbe",
+        "byId": "u_jon",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_4",
+        "merchant": "Print Hub",
+        "category": "Office",
+        "amount": 100.67,
+        "date": "2026-11-18",
+        "status": "pending",
+        "by": "Mira Haddad",
+        "byId": "u_mira",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_5",
+        "merchant": "Harbour Hotel",
+        "category": "Lodging",
+        "amount": 488,
+        "date": "2026-11-13",
+        "status": "pending",
+        "by": "Tomi Lindqvist",
+        "byId": "u_tomi",
+        "receipt": true,
+        "overPolicy": true
+      },
+      {
+        "id": "exp_6",
+        "merchant": "Cab Co.",
+        "category": "Travel",
+        "amount": 67.86,
+        "date": "2026-11-03",
+        "status": "pending",
+        "by": "Sam Okafor",
+        "byId": "u_sam",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_7",
+        "merchant": "Stack Software",
+        "category": "Software",
+        "amount": 90.58,
+        "date": "2026-11-06",
+        "status": "pending",
+        "by": "Lena Park",
+        "byId": "u_lena",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_8",
+        "merchant": "Skyway Air",
+        "category": "Travel",
+        "amount": 122.18,
+        "date": "2026-11-04",
+        "status": "pending",
+        "by": "Jon Abbe",
+        "byId": "u_jon",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_9",
+        "merchant": "Skyway Air",
+        "category": "Travel",
+        "amount": 177.12,
+        "date": "2026-11-09",
+        "status": "pending",
+        "by": "Mira Haddad",
+        "byId": "u_mira",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_10",
+        "merchant": "Stack Software",
+        "category": "Software",
+        "amount": 61.82,
+        "date": "2026-11-10",
+        "status": "approved",
+        "by": "Sam Okafor",
+        "byId": "u_sam",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_11",
+        "merchant": "Bistro 9",
+        "category": "Meals",
+        "amount": 151.05,
+        "date": "2026-10-20",
+        "status": "approved",
+        "by": "Lena Park",
+        "byId": "u_lena",
+        "receipt": false,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_12",
+        "merchant": "CloudDocs",
+        "category": "Software",
+        "amount": 16,
+        "date": "2026-11-08",
+        "status": "approved",
+        "by": "Jon Abbe",
+        "byId": "u_jon",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_13",
+        "merchant": "Coastline Rail",
+        "category": "Travel",
+        "amount": 187.32,
+        "date": "2026-11-16",
+        "status": "approved",
+        "by": "Mira Haddad",
+        "byId": "u_mira",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_14",
+        "merchant": "Harbour Hotel",
+        "category": "Lodging",
+        "amount": 348.55,
+        "date": "2026-11-01",
+        "status": "approved",
+        "by": "Tomi Lindqvist",
+        "byId": "u_tomi",
+        "receipt": true,
+        "overPolicy": true
+      },
+      {
+        "id": "exp_15",
+        "merchant": "Print Hub",
+        "category": "Office",
+        "amount": 167.22,
+        "date": "2026-10-20",
+        "status": "approved",
+        "by": "Sam Okafor",
+        "byId": "u_sam",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_16",
+        "merchant": "Print Hub",
+        "category": "Office",
+        "amount": 145,
+        "date": "2026-11-13",
+        "status": "approved",
+        "by": "Lena Park",
+        "byId": "u_lena",
+        "receipt": false,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_17",
+        "merchant": "Stack Software",
+        "category": "Software",
+        "amount": 15.84,
+        "date": "2026-11-24",
+        "status": "approved",
+        "by": "Jon Abbe",
+        "byId": "u_jon",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_18",
+        "merchant": "Stack Software",
+        "category": "Software",
+        "amount": 75.7,
+        "date": "2026-11-05",
+        "status": "approved",
+        "by": "Mira Haddad",
+        "byId": "u_mira",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_19",
+        "merchant": "Stack Software",
+        "category": "Software",
+        "amount": 88.39,
+        "date": "2026-11-15",
+        "status": "approved",
+        "by": "Tomi Lindqvist",
+        "byId": "u_tomi",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_20",
+        "merchant": "CloudDocs",
+        "category": "Software",
+        "amount": 19.65,
+        "date": "2026-11-05",
+        "status": "approved",
+        "by": "Sam Okafor",
+        "byId": "u_sam",
+        "receipt": false,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_21",
+        "merchant": "Print Hub",
+        "category": "Office",
+        "amount": 122.65,
+        "date": "2026-10-19",
+        "status": "approved",
+        "by": "Lena Park",
+        "byId": "u_lena",
+        "receipt": false,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_22",
+        "merchant": "Print Hub",
+        "category": "Office",
+        "amount": 41.86,
+        "date": "2026-10-17",
+        "status": "approved",
+        "by": "Jon Abbe",
+        "byId": "u_jon",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_23",
+        "merchant": "Skyway Air",
+        "category": "Travel",
+        "amount": 55.93,
+        "date": "2026-11-16",
+        "status": "approved",
+        "by": "Mira Haddad",
+        "byId": "u_mira",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_24",
+        "merchant": "Paper & Co",
+        "category": "Office",
+        "amount": 17.42,
+        "date": "2026-10-25",
+        "status": "approved",
+        "by": "Alex Reyes",
+        "byId": "u_alex",
+        "receipt": true,
+        "overPolicy": false
+      },
+      {
+        "id": "exp_25",
+        "merchant": "Nordic Coffee",
+        "category": "Meals",
+        "amount": 97.67,
+        "date": "2026-11-23",
+        "status": "pending",
+        "by": "Alex Reyes",
+        "byId": "u_alex",
+        "receipt": false,
+        "overPolicy": false
+      }
+    ],
+    "team": [
+      {
+        "id": "u_sam",
+        "name": "Sam Okafor",
+        "role": "Submitter",
+        "email": "sam@demo.wf"
+      },
+      {
+        "id": "u_lena",
+        "name": "Lena Park",
+        "role": "Submitter",
+        "email": "lena@demo.wf"
+      },
+      {
+        "id": "u_jon",
+        "name": "Jon Abbe",
+        "role": "Submitter",
+        "email": "jon@demo.wf"
+      },
+      {
+        "id": "u_mira",
+        "name": "Mira Haddad",
+        "role": "Submitter",
+        "email": "mira@demo.wf"
+      },
+      {
+        "id": "u_tomi",
+        "name": "Tomi Lindqvist",
+        "role": "Submitter",
+        "email": "tomi@demo.wf"
+      },
+      {
+        "id": "u_alex",
+        "name": "Alex Reyes",
+        "role": "Approver",
+        "email": "alex@demo.wf"
+      },
+      {
+        "id": "u_priya",
+        "name": "Priya Walsh",
+        "role": "Admin",
+        "email": "priya@demo.wf"
+      }
+    ],
+    "settings": {
+      "plan": "pro",
+      "policyLimit": 150,
+      "currency": "EUR",
+      "company": "Ledgerline Ltd"
+    }
+  }
+}

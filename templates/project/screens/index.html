@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{NAME}}</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="{{NAME}}">
+    <wf-nav-item href="/" icon="home">Home</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-page>
+      <wf-page-header title="Welcome" subtitle="This prototype is empty. Describe what to build with /wireframe in Claude Code."></wf-page-header>
+      <wf-card id="whoami"></wf-card>
+    </wf-page>
+  </main>
+</wf-app>
+<script type="module">
+  const wf = await window.wfReady;
+  wf.mount('#whoami', () => wf.html`<h3>Signed in as ${wf.user?.name || 'nobody'}</h3><p>${wf.user?.why || ''}</p>`);
+</script>
+</body>
+</html>

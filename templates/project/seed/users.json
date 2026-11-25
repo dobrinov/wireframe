@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": "empty",
+      "name": "Elif Novak",
+      "role": "New user",
+      "email": "elif@demo.wf",
+      "tagline": "Brand-new account, zero data",
+      "why": "Shows every empty state and the first-run experience.",
+      "tests": ["Empty states", "First-run onboarding"],
+      "stats": { "Records": 0 },
+      "flags": { "Plan": "Free", "Onboarding": "Not started" },
+      "seed": "seed/empty.json"
+    },
+    {
+      "id": "power",
+      "name": "Priya Walsh",
+      "role": "Admin",
+      "email": "priya@demo.wf",
+      "tagline": "Every feature on, lots of data",
+      "why": "Kitchen-sink account that stress-tests lists, tables and settings.",
+      "tests": ["Long lists and pagination", "Admin settings"],
+      "stats": { "Records": 0 },
+      "flags": { "Plan": "Enterprise", "Role": "Admin" },
+      "seed": "seed/power.json"
+    }
+  ]
+}

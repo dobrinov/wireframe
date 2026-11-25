@@ -1,0 +1,200 @@
+{
+  "users": [
+    {
+      "id": "empty",
+      "name": "Elif Novak",
+      "role": "Employee · just joined",
+      "email": "elif@demo.wf",
+      "tagline": "Brand-new account, zero data",
+      "why": "Shows every empty state and the first-run checklist. If a screen breaks with no data, Elif finds it.",
+      "tests": [
+        "Empty states on every list",
+        "Onboarding checklist",
+        "First expense flow"
+      ],
+      "stats": {
+        "Expenses": 0,
+        "To approve": 0,
+        "Team": 1
+      },
+      "flags": {
+        "Plan": "Free",
+        "Role": "Submitter",
+        "Onboarding": "0 / 4"
+      },
+      "plan": "free",
+      "permissions": [
+        "submit"
+      ],
+      "seed": "seed/empty.json",
+      "addedIn": "v1",
+      "addedBecause": "initial cast",
+      "memberId": "u_elif"
+    },
+    {
+      "id": "submitter",
+      "name": "Sam Okafor",
+      "role": "Employee · Sales",
+      "email": "sam@demo.wf",
+      "tagline": "Everyday submitter, mixed statuses",
+      "why": "The typical user: drafts to finish, one rejected expense, missing receipts. Exercises the core submit loop.",
+      "tests": [
+        "Draft → submit",
+        "Fix the rejected expense",
+        "Missing-receipt warnings"
+      ],
+      "stats": {
+        "Expenses": 12,
+        "Drafts": 3,
+        "Rejected": 1,
+        "Missing receipts": 3
+      },
+      "flags": {
+        "Plan": "Pro",
+        "Role": "Submitter",
+        "Manager": "Alex Reyes"
+      },
+      "plan": "pro",
+      "permissions": [
+        "submit"
+      ],
+      "seed": "seed/submitter.json",
+      "addedIn": "v1",
+      "addedBecause": "initial cast",
+      "memberId": "u_sam"
+    },
+    {
+      "id": "approver",
+      "name": "Alex Reyes",
+      "role": "Manager · Sales",
+      "email": "alex@demo.wf",
+      "tagline": "Manager with a full approval queue",
+      "why": "Has nine items waiting from a team of five, two over policy. Use for bulk approve and reject with a reason.",
+      "tests": [
+        "Bulk approve",
+        "Reject with reason",
+        "Over-policy flags"
+      ],
+      "stats": {
+        "To approve": 9,
+        "Team": 5,
+        "Over policy": 2,
+        "Approved (30d)": 15
+      },
+      "flags": {
+        "Plan": "Pro",
+        "Role": "Approver",
+        "Delegate": "None"
+      },
+      "plan": "pro",
+      "permissions": [
+        "submit",
+        "approve"
+      ],
+      "seed": "seed/approver.json",
+      "addedIn": "v1",
+      "addedBecause": "initial cast",
+      "memberId": "u_alex"
+    },
+    {
+      "id": "power",
+      "name": "Priya Walsh",
+      "role": "Finance admin",
+      "email": "priya@demo.wf",
+      "tagline": "Every feature on, lots of data",
+      "why": "Kitchen-sink account: 96 expenses, 19 people, integrations and every permission. Stress-tests tables, pagination and settings.",
+      "tests": [
+        "Pagination and sorting",
+        "Team admin",
+        "Long names in tables"
+      ],
+      "stats": {
+        "Expenses": 96,
+        "To approve": 14,
+        "Team": 19,
+        "Integrations": 3
+      },
+      "flags": {
+        "Plan": "Enterprise",
+        "Role": "Admin",
+        "2FA": "On"
+      },
+      "plan": "enterprise",
+      "permissions": [
+        "submit",
+        "approve",
+        "admin"
+      ],
+      "seed": "seed/power.json",
+      "addedIn": "v1",
+      "addedBecause": "initial cast",
+      "memberId": "u_priya"
+    },
+    {
+      "id": "trial-expired",
+      "name": "Tomás Meyer",
+      "role": "Owner · small business",
+      "email": "tomas@demo.wf",
+      "tagline": "Trial ended, read-only",
+      "why": "Shows the expired-trial banner, read-only lists and the upgrade path.",
+      "tests": [
+        "Upgrade gates",
+        "Read-only tables",
+        "Billing banner"
+      ],
+      "stats": {
+        "Expenses": 8,
+        "Team": 2,
+        "Days expired": 3,
+        "Write access": "Locked"
+      },
+      "flags": {
+        "Plan": "Trial (expired)",
+        "Role": "Owner",
+        "Card on file": "No"
+      },
+      "plan": "trial_expired",
+      "permissions": [
+        "submit",
+        "approve",
+        "admin"
+      ],
+      "seed": "seed/trial-expired.json",
+      "addedIn": "v1",
+      "addedBecause": "billing in scope",
+      "memberId": "u_tomas"
+    },
+    {
+      "id": "viewer",
+      "name": "Rosa Vidal",
+      "role": "External accountant",
+      "email": "rosa@demo.wf",
+      "tagline": "View-only, no permissions",
+      "why": "Permissions edge case: every create, approve and edit control is hidden or disabled with a reason.",
+      "tests": [
+        "Disabled actions explain why",
+        "Export still works",
+        "No approvals tab"
+      ],
+      "stats": {
+        "Visible expenses": 80,
+        "Can edit": 0,
+        "Exports": "Yes",
+        "Team": 19
+      },
+      "flags": {
+        "Plan": "Enterprise",
+        "Role": "Viewer",
+        "Scope": "Finance only"
+      },
+      "plan": "enterprise",
+      "permissions": [
+        "view"
+      ],
+      "seed": "seed/viewer.json",
+      "addedIn": "v1",
+      "addedBecause": "initial cast",
+      "memberId": null
+    }
+  ]
+}

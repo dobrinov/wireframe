@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wf component library</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+<style>
+  .lib-demo { display: flex; flex-direction: column; gap: var(--wf-s-3); }
+  .lib-code { margin: 0; background: var(--wf-ink); color: var(--wf-fill); border-radius: var(--wf-r-md); padding: var(--wf-s-3); font: 11.5px/1.6 var(--wf-font-mono); white-space: pre-wrap; overflow-x: auto; }
+  .lib-toc { position: sticky; top: 0; }
+  wf-card > .lib-name { font: 500 12px var(--wf-font-mono); color: var(--wf-muted); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="wf library">
+    <wf-nav-group>Sections</wf-nav-group>
+    <wf-nav-item href="#rules" icon="info">Style rules</wf-nav-item>
+    <wf-nav-item href="#layout" icon="grid">Layout</wf-nav-item>
+    <wf-nav-item href="#content" icon="image">Content</wf-nav-item>
+    <wf-nav-item href="#inputs" icon="edit">Inputs</wf-nav-item>
+    <wf-nav-item href="#navigation" icon="menu">Navigation</wf-nav-item>
+    <wf-nav-item href="#data" icon="chart">Data display</wf-nav-item>
+    <wf-nav-item href="#feedback" icon="bell">Feedback &amp; overlays</wf-nav-item>
+    <wf-nav-item href="#icons" icon="star">Icons</wf-nav-item>
+    <wf-nav-item href="#helpers" icon="zap">JS helpers</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-page>
+      <wf-page-header title="Wireframe component library" subtitle="Every component here is greyscale, keyboard-usable and built only from wf.css tokens. Copy the snippet under each one."></wf-page-header>
+
+      <wf-section id="rules" title="Style rules">
+        <wf-grid cols="4">
+          <wf-card variant="soft"><h3>Structure, not style</h3><p>Show what is there and how it behaves. No brand, imagery or decoration.</p></wf-card>
+          <wf-card variant="soft"><h3>Greyscale only</h3><p>Colour belongs to the harness: blue = agent, orange = comments.</p></wf-card>
+          <wf-card variant="soft"><h3>States without colour</h3><p>Ink fill = selected/done, dashed = problem, soft line = disabled/archived.</p></wf-card>
+          <wf-card variant="soft"><h3>One stroke language</h3><p>1 / 1.5 / 2 px lines, radii 4·6·8·10·pill, flat offset shadows only.</p></wf-card>
+        </wf-grid>
+      </wf-section>
+
+      <wf-section id="layout" title="Layout">
+        <wf-grid cols="2">
+          <wf-card class="lib-demo"><div class="lib-name"><span>App shell</span><span>wf-app · wf-sidebar · wf-nav-item · wf-topbar</span></div>
+            <div style="border:1.5px solid var(--wf-ink);border-radius:8px;overflow:hidden;height:220px;display:flex">
+              <div style="width:150px;border-right:1.5px solid var(--wf-ink);padding:10px;display:flex;flex-direction:column;gap:6px"><b style="font-size:13px">Product</b><wf-text-ph lines="4"></wf-text-ph></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div style="height:40px;border-bottom:1.5px solid var(--wf-ink)"></div><div style="padding:12px"><wf-text-ph heading lines="3"></wf-text-ph></div></div>
+            </div>
+<pre class="lib-code">&lt;wf-app&gt;
+  &lt;wf-sidebar brand="Ledgerline"&gt;
+    &lt;wf-nav-item href="/" icon="home"&gt;Dashboard&lt;/wf-nav-item&gt;
+    &lt;wf-nav-item href="/approvals.html" icon="inbox" count="9"&gt;Approvals&lt;/wf-nav-item&gt;
+    &lt;wf-nav-group&gt;Settings&lt;/wf-nav-group&gt;
+    &lt;wf-nav-item href="/team.html" icon="users"&gt;Team&lt;/wf-nav-item&gt;
+  &lt;/wf-sidebar&gt;
+  &lt;main&gt;
+    &lt;wf-topbar&gt;&lt;wf-search placeholder="Search" shortcut="⌘K"&gt;&lt;/wf-search&gt;&lt;wf-spacer&gt;&lt;/wf-spacer&gt;&lt;wf-avatar name="Ana Bianchi"&gt;&lt;/wf-avatar&gt;&lt;/wf-topbar&gt;
+    &lt;wf-page&gt;…&lt;/wf-page&gt;
+  &lt;/main&gt;
+&lt;/wf-app&gt;</pre>
+          </wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Top nav (marketing)</span><span>wf-topbar</span></div>
+            <wf-topbar brand="Logo" variant="marketing" style="border:1.5px solid var(--wf-ink);border-radius:8px"><a href="#layout" aria-current="page">Product</a><a href="#layout">Pricing</a><a href="#layout">Docs</a><wf-spacer></wf-spacer><a href="#layout">Sign in</a><a class="wf-btn" data-variant="primary" data-size="sm" href="#layout">Get started</a></wf-topbar>
+<pre class="lib-code">&lt;wf-topbar brand="Logo" variant="marketing"&gt;
+  &lt;a href="/"&gt;Product&lt;/a&gt;&lt;a href="/pricing.html"&gt;Pricing&lt;/a&gt;
+  &lt;wf-spacer&gt;&lt;/wf-spacer&gt;
+  &lt;a class="wf-btn" data-variant="primary" href="/signup.html"&gt;Get started&lt;/a&gt;
+&lt;/wf-topbar&gt;</pre>
+            <div class="lib-name"><span>Page header</span><span>wf-page-header</span></div>
+            <wf-page-header title="Report #1042" subtitle="Submitted 21 Nov" crumbs="Expenses|#layout / Q4|#layout / Report #1042"><button>Export</button><button data-variant="primary">Submit</button></wf-page-header>
+<pre class="lib-code">&lt;wf-page-header title="Report #1042" subtitle="Submitted 21 Nov"
+  crumbs="Expenses|/expenses.html / Report #1042"&gt;
+  &lt;button&gt;Export&lt;/button&gt;&lt;button data-variant="primary"&gt;Submit&lt;/button&gt;
+&lt;/wf-page-header&gt;</pre>
+          </wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Stack · row · grid · split</span><span>wf-stack · wf-row · wf-grid · wf-split</span></div>
+            <wf-row justify="between"><wf-tag>wf-row justify="between"</wf-tag><wf-tag>right</wf-tag></wf-row>
+            <wf-grid cols="3" gap="2"><wf-card variant="flat" style="height:48px"></wf-card><wf-card variant="flat" style="height:48px"></wf-card><wf-card variant="flat" style="height:48px"></wf-card></wf-grid>
+            <wf-split ratio="1:2"><wf-card variant="flat" style="height:48px"></wf-card><wf-card variant="flat" style="height:48px"></wf-card></wf-split>
+<pre class="lib-code">&lt;wf-stack gap="4"&gt;…&lt;/wf-stack&gt;            gap: 0 1 2 (3) 4 6 8
+&lt;wf-row justify="between" align="start"&gt;…&lt;/wf-row&gt;
+&lt;wf-grid cols="3"&gt;&lt;wf-card span="2"&gt;…&lt;/wf-card&gt;…&lt;/wf-grid&gt;
+&lt;wf-split ratio="1:2"&gt;&lt;aside&gt;…&lt;/aside&gt;&lt;section&gt;…&lt;/section&gt;&lt;/wf-split&gt;</pre>
+          </wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Card · section · divider</span><span>wf-card · wf-section · wf-divider</span></div>
+            <wf-grid cols="3" gap="2"><wf-card title="Default"><wf-text-ph lines="2"></wf-text-ph></wf-card><wf-card variant="soft" title="Soft"><wf-text-ph lines="2"></wf-text-ph></wf-card><wf-card variant="flat" title="Flat"><wf-text-ph lines="2"></wf-text-ph></wf-card></wf-grid>
+            <wf-divider label="or"></wf-divider>
+<pre class="lib-code">&lt;wf-card title="Recent" action="View all" action-href="/all.html"&gt;…&lt;/wf-card&gt;
+&lt;wf-card variant="soft|flat" padding="0" href="/detail.html"&gt;…&lt;/wf-card&gt;
+&lt;wf-section title="Team" subtitle="6 people"&gt;…&lt;/wf-section&gt;
+&lt;wf-divider&gt;&lt;/wf-divider&gt;  &lt;wf-divider label="or"&gt;&lt;/wf-divider&gt;</pre>
+          </wf-card>
+        </wf-grid>
+      </wf-section>
+
+      <wf-section id="content" title="Content">
+        <wf-grid cols="3">
+          <wf-card class="lib-demo"><div class="lib-name"><span>Text placeholder</span><span>wf-text-ph</span></div><wf-text-ph heading lines="4"></wf-text-ph>
+<pre class="lib-code">&lt;wf-text-ph heading lines="4"&gt;&lt;/wf-text-ph&gt;</pre><small>Only when copy is unknown. Prefer real words.</small></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Image placeholder</span><span>wf-image</span></div><wf-image label="Product photo" ratio="16:9"></wf-image>
+<pre class="lib-code">&lt;wf-image label="Product photo" ratio="4:3"&gt;&lt;/wf-image&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Avatar · group · icon</span><span>wf-avatar · wf-icon</span></div>
+            <wf-row><wf-avatar name="Ana Bianchi"></wf-avatar><wf-avatar name="Kemal Demir" size="44"></wf-avatar><wf-avatar-group names="Ana B, Kemal D, Lena P, Jon A, Sam O, Rosa V" max="4"></wf-avatar-group></wf-row>
+            <wf-row><wf-icon name="inbox"></wf-icon><wf-icon name="settings"></wf-icon><wf-icon name="chart" size="24"></wf-icon><wf-icon name="not-a-real-icon"></wf-icon></wf-row>
+<pre class="lib-code">&lt;wf-avatar name="Ana Bianchi" size="44"&gt;&lt;/wf-avatar&gt;
+&lt;wf-avatar-group names="Ana B, Kemal D, Lena P" max="2"&gt;&lt;/wf-avatar-group&gt;
+&lt;wf-icon name="inbox" size="24"&gt;&lt;/wf-icon&gt;</pre></wf-card>
+        </wf-grid>
+      </wf-section>
+
+      <wf-section id="inputs" title="Inputs">
+        <wf-grid cols="3">
+          <wf-card class="lib-demo" span="2"><div class="lib-name"><span>Buttons</span><span>button · a.wf-btn</span></div>
+            <wf-row><button data-variant="primary">Save changes</button><button>Cancel</button><button data-variant="ghost">Learn more</button><button disabled>Disabled</button><button data-variant="danger">Delete</button><button data-icon-only aria-label="Add" data-tip="Add expense" data-tip-kbd="N"><wf-icon name="plus"></wf-icon></button></wf-row>
+            <wf-row><button data-variant="primary" data-size="sm">Small</button><button data-variant="primary">Medium</button><button data-variant="primary" data-size="lg">Large</button><span class="wf-btn-group"><button>Day</button><button>Week</button><button>Month</button></span><button><wf-icon name="download" size="16"></wf-icon>Export</button></wf-row>
+<pre class="lib-code">&lt;button data-variant="primary|ghost|danger" data-size="sm|lg"&gt;Save&lt;/button&gt;
+&lt;button data-icon-only aria-label="Add"&gt;&lt;wf-icon name="plus"&gt;&lt;/wf-icon&gt;&lt;/button&gt;
+&lt;a class="wf-btn" data-variant="primary" href="/new.html"&gt;New&lt;/a&gt;
+&lt;span class="wf-btn-group"&gt;&lt;button&gt;…&lt;/button&gt;&lt;button&gt;…&lt;/button&gt;&lt;/span&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Field · states</span><span>wf-field</span></div>
+            <wf-field label="Email" help="We’ll send the receipt here"><input type="email" placeholder="name@company.com"></wf-field>
+            <wf-field label="VAT number" error="Must be 9 digits"><input value="GB12"></wf-field>
+            <wf-field label="Company" optional><input disabled value="Ledgerline Ltd"></wf-field>
+<pre class="lib-code">&lt;wf-field label="Email" help="…" error="…" required|optional&gt;
+  &lt;input type="email"&gt;
+&lt;/wf-field&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Select · textarea · date</span><span>native</span></div>
+            <wf-field label="Category"><select><option>Travel</option><option>Meals</option><option>Software</option></select></wf-field>
+            <wf-field label="Date"><input type="date" value="2026-11-25"></wf-field>
+            <wf-field label="Notes"><textarea placeholder="Context for the approver…"></textarea></wf-field>
+<pre class="lib-code">&lt;wf-field label="Category"&gt;&lt;select&gt;…&lt;/select&gt;&lt;/wf-field&gt;
+&lt;input type="date"&gt;  &lt;textarea&gt;&lt;/textarea&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Combobox · search · tags</span><span>wf-combobox · wf-search · wf-tags</span></div>
+            <wf-field label="Merchant"><wf-combobox options="Coastline Rail, Harbour Hotel, Stack Software, Bistro 9" placeholder="Choose a merchant"></wf-combobox></wf-field>
+            <wf-search placeholder="Search expenses" shortcut="⌘/"></wf-search>
+            <wf-tags value="travel,Q4" placeholder="Add tag…"></wf-tags>
+<pre class="lib-code">&lt;wf-combobox options="A, B, C" value="B"&gt;&lt;/wf-combobox&gt;   → change {value}
+&lt;wf-search placeholder="Search" shortcut="⌘K"&gt;&lt;/wf-search&gt;  → search {value}
+&lt;wf-tags value="a,b"&gt;&lt;/wf-tags&gt;                          → change {value[]}</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Checkbox · radio · switch</span><span>native · wf-switch</span></div>
+            <label class="wf-check"><input type="checkbox" checked> Receipt attached</label>
+            <label class="wf-check"><input type="checkbox"> Billable to client</label>
+            <wf-row><label class="wf-check"><input type="radio" name="f" checked> Monthly</label><label class="wf-check"><input type="radio" name="f"> Quarterly</label></wf-row>
+            <wf-switch label="Email alerts" checked></wf-switch>
+            <wf-switch label="Weekly digest"></wf-switch>
+<pre class="lib-code">&lt;label class="wf-check"&gt;&lt;input type="checkbox"&gt; Label&lt;/label&gt;
+&lt;wf-switch label="Email alerts" checked name="alerts"&gt;&lt;/wf-switch&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Segmented · stepper · range</span><span>wf-segmented · wf-stepper</span></div>
+            <wf-segmented options="Day,Week,Month" value="Week"></wf-segmented>
+            <wf-stepper value="3" min="0" max="9" label="Guests"></wf-stepper>
+            <input type="range" value="40" aria-label="Budget">
+<pre class="lib-code">&lt;wf-segmented options="Day,Week,Month" value="Week"&gt;&lt;/wf-segmented&gt;
+&lt;wf-stepper value="1" min="0" max="9" label="Guests"&gt;&lt;/wf-stepper&gt;
+&lt;input type="range"&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Upload</span><span>wf-upload</span></div>
+            <wf-upload label="Drop receipts" hint="PDF or JPG, up to 10 MB" files="receipt-0412.pdf" multiple></wf-upload>
+<pre class="lib-code">&lt;wf-upload label="Drop receipts" hint="…" multiple&gt;&lt;/wf-upload&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Form layout</span><span>form.wf-form</span></div>
+            <form class="wf-form" onsubmit="event.preventDefault();wf.toast('Saved')">
+              <wf-grid cols="2" gap="2"><wf-field label="First name"><input name="first"></wf-field><wf-field label="Last name"><input name="last"></wf-field></wf-grid>
+              <wf-row justify="end"><button type="button">Back</button><button data-variant="primary">Continue</button></wf-row>
+            </form>
+<pre class="lib-code">&lt;form class="wf-form"&gt;…fields…&lt;wf-row justify="end"&gt;…&lt;/wf-row&gt;&lt;/form&gt;
+const values = wf.formData(form)</pre></wf-card>
+        </wf-grid>
+      </wf-section>
+
+      <wf-section id="navigation" title="Navigation">
+        <wf-grid cols="3">
+          <wf-card class="lib-demo"><div class="lib-name"><span>Tabs</span><span>wf-tabs</span></div>
+            <wf-tabs counts="9,2"><div data-tab="Waiting"><wf-text-ph lines="2"></wf-text-ph></div><div data-tab="Over policy">Two expenses over policy.</div><div data-tab="Done">All done.</div></wf-tabs>
+            <wf-tabs variant="pill" tabs="All,Pending,Paid"></wf-tabs>
+<pre class="lib-code">&lt;wf-tabs value="Waiting" counts="9,2"&gt;
+  &lt;div data-tab="Waiting"&gt;…&lt;/div&gt;&lt;div data-tab="Done"&gt;…&lt;/div&gt;
+&lt;/wf-tabs&gt;   variant="pill" · tabs="A,B" (no panels) · change {value}</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Breadcrumbs · pagination</span><span>wf-breadcrumbs · wf-pagination</span></div>
+            <wf-breadcrumbs><a href="#navigation">Expenses</a><a href="#navigation">Q4</a><span>Report #1042</span></wf-breadcrumbs>
+            <wf-pagination total="284" per-page="25" page="2"></wf-pagination>
+<pre class="lib-code">&lt;wf-breadcrumbs&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;span&gt;Here&lt;/span&gt;&lt;/wf-breadcrumbs&gt;
+&lt;wf-pagination total="284" per-page="25" page="1"&gt;&lt;/wf-pagination&gt; → change {page}</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Steps (wizard)</span><span>wf-steps</span></div>
+            <wf-steps items="Details,Receipts,Review" current="2"></wf-steps>
+<pre class="lib-code">&lt;wf-steps items="Details,Receipts,Review" current="2"&gt;&lt;/wf-steps&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Menu</span><span>wf-menu</span></div>
+            <wf-row><wf-menu label="Actions"><wf-menu-item icon="edit" shortcut="E">Edit</wf-menu-item><wf-menu-item icon="copy">Duplicate</wf-menu-item><hr><wf-menu-item icon="trash" variant="danger">Delete</wf-menu-item></wf-menu>
+            <wf-menu aria-label="Row actions"><wf-menu-item>Open</wf-menu-item><wf-menu-item>Archive</wf-menu-item></wf-menu></wf-row>
+<pre class="lib-code">&lt;wf-menu label="Actions" align="right"&gt;   (no label → ⋯ icon button)
+  &lt;wf-menu-item icon="edit" shortcut="E" value="edit"&gt;Edit&lt;/wf-menu-item&gt;
+  &lt;hr&gt;&lt;wf-menu-item variant="danger" href="/x.html"&gt;Delete&lt;/wf-menu-item&gt;
+&lt;/wf-menu&gt;   → select {value}</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Command palette</span><span>wf-command</span></div>
+            <p>Press <kbd>⌘K</kbd> anywhere on this page.</p>
+            <wf-command><wf-menu-item>New expense</wf-menu-item><wf-menu-item>New report</wf-menu-item></wf-command>
+<pre class="lib-code">&lt;wf-command&gt;&lt;wf-menu-item href="/new.html"&gt;New expense&lt;/wf-menu-item&gt;&lt;/wf-command&gt;
+Lists every wf-nav-item automatically. ⌘K opens it.</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Accordion · tree</span><span>details · ul.wf-tree</span></div>
+            <details open><summary>Billing details</summary><wf-text-ph lines="2"></wf-text-ph></details>
+            <details><summary>Tax settings</summary><p>VAT registered.</p></details>
+            <ul class="wf-tree"><li><details open><summary>Company</summary><ul><li>Finance</li><li><details><summary>Sales</summary><ul><li>EMEA</li></ul></details></li></ul></details></li></ul>
+<pre class="lib-code">&lt;details open&gt;&lt;summary&gt;Title&lt;/summary&gt;…&lt;/details&gt;
+&lt;ul class="wf-tree"&gt;&lt;li&gt;&lt;details&gt;&lt;summary&gt;…&lt;/summary&gt;&lt;ul&gt;…&lt;/ul&gt;&lt;/details&gt;&lt;/li&gt;&lt;/ul&gt;</pre></wf-card>
+        </wf-grid>
+      </wf-section>
+
+      <wf-section id="data" title="Data display">
+        <wf-grid cols="3">
+          <wf-card class="lib-demo" span="2"><div class="lib-name"><span>Table · sortable · selectable · empty state</span><span>wf-table</span></div>
+            <wf-table sortable selectable empty="No expenses">
+              <table><thead><tr><th>Merchant</th><th>Submitted by</th><th>Status</th><th class="wf-num">Amount</th><th data-nosort></th></tr></thead>
+              <tbody>
+                <tr data-id="1"><td>Coastline Rail</td><td>Ana B.</td><td><wf-badge>Pending</wf-badge></td><td class="wf-num">€184.20</td><td><wf-menu align="right" aria-label="Row actions"><wf-menu-item>Open</wf-menu-item><wf-menu-item>Approve</wf-menu-item></wf-menu></td></tr>
+                <tr data-id="2"><td>Harbour Hotel</td><td>Kemal D.</td><td><wf-badge status="done">Approved</wf-badge></td><td class="wf-num">€612.00</td><td></td></tr>
+                <tr data-id="3"><td>Stack Software</td><td>Ana B.</td><td><wf-badge status="problem">Rejected</wf-badge></td><td class="wf-num">€49.00</td><td></td></tr>
+              </tbody></table>
+            </wf-table>
+<pre class="lib-code">&lt;wf-table sortable selectable empty="No expenses" empty-text="…"&gt;
+  &lt;table&gt;&lt;thead&gt;…&lt;/thead&gt;&lt;tbody&gt;&lt;tr data-id="exp_1" data-href="/expense.html?id=exp_1"&gt;…&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/wf-table&gt;   → selection {ids}, sort {column, dir} · table.selected · th data-nosort · td data-sort</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Stat tile</span><span>wf-stat</span></div>
+            <wf-stat label="Pending approval" value="€4,820" delta="+12% vs last month" trend="3,4,3,6,5,8,7,9"></wf-stat>
+<pre class="lib-code">&lt;wf-stat label="Pending" value="€4,820" delta="+12%" trend="3,4,6,5"&gt;&lt;/wf-stat&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Bar chart</span><span>wf-chart</span></div>
+            <wf-chart type="bar" values="4,6,5,9,7,6|3,4,4,6,5,5" labels="Jun,Jul,Aug,Sep,Oct,Nov" series="2026,2025" height="150"></wf-chart>
+<pre class="lib-code">&lt;wf-chart type="bar|line|area|donut" values="4,6,5|3,4,4"
+  labels="Jun,Jul,Aug" series="2026,2025" height="160"&gt;&lt;/wf-chart&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Line · area</span><span>wf-chart</span></div>
+            <wf-chart type="line" values="2,4,3,6,5,8,7|1,2,2,3,3,4,4" labels="M,T,W,T,F,S,S" height="120"></wf-chart>
+            <wf-chart type="area" values="2,3,5,4,6,7,9" height="80"></wf-chart></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Donut</span><span>wf-chart</span></div>
+            <wf-chart type="donut" values="55,25,20" labels="Travel,Meals,Software" height="120"></wf-chart></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Badge · tag</span><span>wf-badge · wf-tag</span></div>
+            <wf-row gap="2"><wf-badge>Pending</wf-badge><wf-badge status="done">Paid</wf-badge><wf-badge status="problem">Overdue</wf-badge><wf-badge status="archived">Archived</wf-badge><wf-badge status="count">12</wf-badge></wf-row>
+            <wf-row gap="2"><wf-tag>travel</wf-tag><wf-tag>client-x</wf-tag></wf-row>
+<pre class="lib-code">&lt;wf-badge status="done|problem|archived|count"&gt;Paid&lt;/wf-badge&gt;
+&lt;wf-tag&gt;travel&lt;/wf-tag&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>List</span><span>wf-list · wf-list-item</span></div>
+            <wf-list><wf-list-item avatar="Ana Bianchi" title="Ana Bianchi" meta="3 reports pending" href="#data"></wf-list-item><wf-list-item icon="file" title="November report" meta="€845.20"><wf-badge>Draft</wf-badge></wf-list-item><wf-list-item unread title="Kemal approved #1042" meta="2h ago"></wf-list-item></wf-list>
+<pre class="lib-code">&lt;wf-list&gt;&lt;wf-list-item avatar="Ana B" | icon="file" title="…" meta="…" href="…" unread&gt;
+  …trailing content…&lt;/wf-list-item&gt;&lt;/wf-list&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Key / value</span><span>dl</span></div>
+            <dl><dt>Report ID</dt><dd class="wf-mono">EXP-1042</dd><dt>Owner</dt><dd>Ana Bianchi</dd><dt>Total</dt><dd><b>€845.20</b></dd></dl>
+<pre class="lib-code">&lt;dl&gt;&lt;dt&gt;Owner&lt;/dt&gt;&lt;dd&gt;Ana&lt;/dd&gt;&lt;/dl&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Timeline</span><span>wf-timeline</span></div>
+            <wf-timeline><wf-timeline-item done title="Approved" meta="2h ago">by Kemal</wf-timeline-item><wf-timeline-item title="Receipt added" meta="Yesterday"></wf-timeline-item><wf-timeline-item title="Report created" meta="Mon"></wf-timeline-item></wf-timeline>
+<pre class="lib-code">&lt;wf-timeline&gt;&lt;wf-timeline-item done title="Approved" meta="2h ago"&gt;by Kemal&lt;/wf-timeline-item&gt;&lt;/wf-timeline&gt;</pre></wf-card>
+          <wf-card class="lib-demo" span="2"><div class="lib-name"><span>Kanban</span><span>wf-kanban</span></div>
+            <wf-kanban><wf-kanban-column title="To do"><wf-card>Book venue</wf-card><wf-card>Send invites</wf-card></wf-kanban-column><wf-kanban-column title="Doing"><wf-card>Draft agenda</wf-card></wf-kanban-column><wf-kanban-column title="Done"><wf-card>Pick date</wf-card></wf-kanban-column></wf-kanban>
+<pre class="lib-code">&lt;wf-kanban&gt;&lt;wf-kanban-column title="To do"&gt;&lt;wf-card&gt;…&lt;/wf-card&gt;&lt;/wf-kanban-column&gt;&lt;/wf-kanban&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Calendar</span><span>wf-calendar</span></div>
+            <wf-calendar month="2026-11" marks="3,8,12,21" selected="25"></wf-calendar>
+<pre class="lib-code">&lt;wf-calendar month="2026-11" marks="3,8" selected="25"&gt;&lt;/wf-calendar&gt; → change {date}</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Map · video · file</span><span>wf-map · wf-video · wf-file</span></div>
+            <wf-map pins="30:40 62:55" ratio="2:1"></wf-map>
+            <wf-video ratio="16:9"></wf-video>
+            <wf-file name="invoice-nov.pdf" size="240 KB"></wf-file>
+<pre class="lib-code">&lt;wf-map pins="30:40 62:55"&gt;&lt;/wf-map&gt;  &lt;wf-video&gt;&lt;/wf-video&gt;
+&lt;wf-file name="invoice.pdf" size="240 KB"&gt;&lt;/wf-file&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Chat thread</span><span>wf-thread · wf-message</span></div>
+            <wf-thread><wf-message name="Kemal Demir" time="10:02">Can you add the hotel receipt?</wf-message><wf-message mine name="Ana Bianchi" time="10:05">Uploaded, thanks!</wf-message></wf-thread>
+<pre class="lib-code">&lt;wf-thread&gt;&lt;wf-message name="Kemal" time="10:02"&gt;…&lt;/wf-message&gt;
+  &lt;wf-message mine name="Ana"&gt;…&lt;/wf-message&gt;&lt;/wf-thread&gt;</pre></wf-card>
+        </wf-grid>
+      </wf-section>
+
+      <wf-section id="feedback" title="Feedback & overlays">
+        <wf-grid cols="3">
+          <wf-card class="lib-demo"><div class="lib-name"><span>Modal · drawer · confirm</span><span>wf-modal · wf-drawer · wf.confirm</span></div>
+            <wf-row><button data-open="demo-modal">Open modal</button><button data-open="demo-drawer">Open drawer</button><button id="demo-confirm" data-variant="danger">Delete…</button></wf-row>
+            <wf-modal id="demo-modal" title="Reject 3 expenses?"><p>Submitters get an email with your reason.</p><wf-field label="Reason"><textarea></textarea></wf-field><footer><button data-close>Cancel</button><button data-variant="primary" data-close data-toast="Rejected 3 expenses">Reject</button></footer></wf-modal>
+            <wf-drawer id="demo-drawer" title="Filters"><wf-field label="Status"><select><option>Any</option></select></wf-field><wf-field label="Submitted by"><wf-combobox options="Ana B., Kemal D."></wf-combobox></wf-field><footer><button data-variant="primary" data-close>Apply</button></footer></wf-drawer>
+<pre class="lib-code">&lt;button data-open="reject"&gt;Reject&lt;/button&gt;
+&lt;wf-modal id="reject" title="…" width="480"&gt;…&lt;footer&gt;&lt;button data-close&gt;Cancel&lt;/button&gt;…&lt;/footer&gt;&lt;/wf-modal&gt;
+&lt;wf-drawer id="filters" title="Filters" side="right|left"&gt;…&lt;/wf-drawer&gt;
+if (await wf.confirm({ title, text, confirm: 'Delete', danger: true })) …</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Popover · tooltip</span><span>wf-popover · data-tip</span></div>
+            <wf-row><button data-open="demo-pop">Share…</button><span data-tip="Policy limit is €150/night" tabindex="0"><wf-icon name="info"></wf-icon></span><button disabled data-tip="Only admins can export" data-tip-pos="right">Export</button></wf-row>
+            <wf-popover id="demo-pop" title="Share report"><wf-field label="People"><input placeholder="Add people…"></wf-field><div class="wf-x-popfoot"><button data-close data-variant="primary" data-size="sm">Share</button></div></wf-popover>
+<pre class="lib-code">&lt;button data-open="share"&gt;Share&lt;/button&gt;
+&lt;wf-popover id="share" title="Share" placement="bottom|top|left|right"&gt;…&lt;/wf-popover&gt;
+&lt;span data-tip="Text" data-tip-pos="right" data-tip-kbd="⌘E" tabindex="0"&gt;…&lt;/span&gt;</pre>
+            <small>Tip on a disabled control explains why it is disabled.</small></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Toast</span><span>wf.toast</span></div>
+            <wf-row><button data-toast="Expense submitted">Show toast</button><button id="demo-toast2">Toast with undo</button></wf-row>
+            <wf-toast>Expense submitted</wf-toast>
+<pre class="lib-code">wf.toast('Saved', { action: 'Undo', onAction, variant: 'problem' })
+&lt;button data-toast="Saved"&gt;…&lt;/button&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Alert · banner</span><span>wf-alert · wf-banner</span></div>
+            <wf-alert title="Heads up">Two receipts are missing for November.</wf-alert>
+            <wf-alert variant="problem" title="Couldn’t sync" dismissible>Check your bank connection.</wf-alert>
+            <wf-banner action="Upgrade" href="#feedback">Trial ends in 3 days</wf-banner>
+<pre class="lib-code">&lt;wf-alert variant="info|warning|problem|success" title="…" dismissible&gt;…&lt;/wf-alert&gt;
+&lt;wf-banner action="Upgrade" href="/billing.html" dismissible&gt;…&lt;/wf-banner&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Progress · spinner · skeleton</span><span>wf-progress · wf-spinner · wf-skeleton</span></div>
+            <wf-progress value="60" label="Uploading 3 of 5"></wf-progress>
+            <wf-row><wf-spinner></wf-spinner><wf-skeleton avatar lines="2"></wf-skeleton></wf-row>
+<pre class="lib-code">&lt;wf-progress value="60" max="100" label="…"&gt;&lt;/wf-progress&gt;
+&lt;wf-spinner&gt;&lt;/wf-spinner&gt;  &lt;wf-skeleton avatar lines="3"&gt;&lt;/wf-skeleton&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Empty · error state</span><span>wf-empty</span></div>
+            <wf-empty icon="receipt" title="No expenses yet" text="Snap a receipt to get started."><button data-variant="primary">Add expense</button></wf-empty>
+            <wf-empty variant="error" title="Couldn’t load reports" text="Try again in a moment."><button>Retry</button></wf-empty>
+<pre class="lib-code">&lt;wf-empty icon="receipt" title="…" text="…" variant="error"&gt;&lt;button&gt;…&lt;/button&gt;&lt;/wf-empty&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Onboarding checklist</span><span>wf-checklist</span></div>
+            <wf-checklist title="Get set up" items="Create company:done,Invite team:done,Connect bank,Set approval rules"></wf-checklist>
+<pre class="lib-code">&lt;wf-checklist title="Get set up" items="Create company:done,Invite team"&gt;&lt;/wf-checklist&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Upgrade gate</span><span>wf-gate</span></div>
+            <wf-gate title="Advanced reports" text="Available on the Pro plan." action="Upgrade" href="#feedback"></wf-gate>
+<pre class="lib-code">&lt;wf-gate title="…" text="…" action="Upgrade" href="/billing.html"&gt;&lt;/wf-gate&gt;</pre></wf-card>
+          <wf-card class="lib-demo"><div class="lib-name"><span>Annotation · callout</span><span>wf-note · wf-callout</span></div>
+            <wf-note>Copy TBD — legal needs to sign off on rejection wording.</wf-note>
+            <wf-row><wf-callout>1</wf-callout><span>Numbered callout</span></wf-row>
+<pre class="lib-code">&lt;wf-note&gt;Open question…&lt;/wf-note&gt;  &lt;wf-callout&gt;1&lt;/wf-callout&gt;</pre></wf-card>
+        </wf-grid>
+      </wf-section>
+
+      <wf-section id="icons" title="Icons" subtitle="1.6px line icons. Unknown names render as a soft square placeholder.">
+        <wf-card variant="soft"><div id="icon-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px"></div></wf-card>
+      </wf-section>
+
+      <wf-section id="helpers" title="JS helpers">
+        <wf-card variant="soft">
+<pre class="lib-code">&lt;script type="module"&gt;
+  const wf = await window.wfReady;          // store loaded for the signed-in seeded user
+  wf.user                                   // { id, name, role, plan, flags, … } from seed/users.json
+  wf.store.all('expenses')                  // also get / where / count / add / update / remove / value
+  wf.mount('#list', () =&gt; wf.html`${'${'}rows.map(r =&gt; wf.html`&lt;tr&gt;…&lt;/tr&gt;`)}`)  // re-renders on every store change
+  wf.on('click', '[data-approve]', (e, el) =&gt; wf.store.update('expenses', el.dataset.approve, { status: 'approved' }))
+  wf.params.id                              // ?id=… from the URL
+  wf.format.money(184.2) · wf.format.date(iso) · wf.format.ago(iso)
+  wf.toast('Saved') · await wf.confirm({…}) · wf.open('modal-id') · wf.go('/next.html')
+&lt;/script&gt;</pre>
+        </wf-card>
+      </wf-section>
+    </wf-page>
+  </main>
+</wf-app>
+<script type="module">
+  const wf = await window.wfReady;
+  document.getElementById('icon-grid').innerHTML = wf.icons.map((n) => `<div style="display:flex;align-items:center;gap:8px;font:11px var(--wf-font-mono);color:var(--wf-muted)"><wf-icon name="${n}"></wf-icon>${n}</div>`).join('');
+  document.getElementById('demo-confirm').onclick = async () => { if (await wf.confirm({ title: 'Delete report?', text: 'This cannot be undone.', confirm: 'Delete', danger: true })) wf.toast('Report deleted'); };
+  document.getElementById('demo-toast2').onclick = () => wf.toast('Expense archived', { action: 'Undo', onAction: () => wf.toast('Restored') });
+</script>
+</body>
+</html>

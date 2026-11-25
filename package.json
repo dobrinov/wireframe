@@ -1,0 +1,18 @@
+{
+  "name": "wireframe-kit",
+  "version": "0.1.0",
+  "description": "Agentic LoFi wireframing: /wireframe for Claude Code, a no-build wireframe component library, seeded users and on-UI comments that reach your coding agent.",
+  "type": "module",
+  "bin": {
+    "wf": "bin/wf.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node bin/wf.js serve examples/expense-approvals",
+    "library": "node bin/wf.js library",
+    "test": "node --test test/"
+  },
+  "license": "MIT"
+}

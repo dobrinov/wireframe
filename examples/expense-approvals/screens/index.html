@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Ledgerline</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="Ledgerline">
+    <wf-nav-item href="/" icon="dashboard">Dashboard</wf-nav-item>
+    <wf-nav-item href="/expenses.html" icon="receipt" id="nav-expenses">My expenses</wf-nav-item>
+    <wf-nav-item href="/approvals.html" icon="inbox" id="nav-approvals">Approvals</wf-nav-item>
+    <wf-nav-group>Company</wf-nav-group>
+    <wf-nav-item href="/team.html" icon="users" id="nav-team">Team</wf-nav-item>
+    <wf-nav-item href="/billing.html" icon="credit-card">Billing</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-topbar><wf-search placeholder="Search expenses" shortcut="⌘/" style="max-width:320px;flex:1"></wf-search><wf-spacer></wf-spacer><button data-icon-only data-variant="ghost" aria-label="Notifications" data-tip="Notifications"><wf-icon name="bell"></wf-icon></button><wf-avatar id="who"></wf-avatar></wf-topbar>
+    <wf-page>
+      <wf-page-header id="hello" title="Dashboard"><a class="wf-btn" data-variant="primary" href="/expenses.html?new=1" id="new"><wf-icon name="plus" size="16"></wf-icon>New expense</a></wf-page-header>
+      <div id="first-run" hidden>
+        <wf-grid cols="3">
+          <wf-card span="2"><wf-empty icon="receipt" title="No expenses yet" text="Snap a receipt or add one by hand. It goes to your manager when you submit it."><a class="wf-btn" data-variant="primary" href="/expenses.html?new=1">Add your first expense</a></wf-empty></wf-card>
+          <wf-card><wf-checklist title="Get set up" items="Create your account:done,Add your first expense,Connect your company card,Turn on email alerts"></wf-checklist></wf-card>
+        </wf-grid>
+      </div>
+      <div id="overview" hidden>
+        <wf-stack gap="6">
+          <wf-grid cols="4" id="stats"></wf-grid>
+          <wf-grid cols="3">
+            <wf-card title="Spend by week" span="2"><wf-chart id="weekly" type="bar" height="180"></wf-chart></wf-card>
+            <wf-card title="By category"><wf-chart id="cats" type="donut" height="150"></wf-chart></wf-card>
+          </wf-grid>
+          <wf-card title="Recent activity" action="All expenses" action-href="/expenses.html"><wf-list variant="plain" id="recent"></wf-list></wf-card>
+        </wf-stack>
+      </div>
+    </wf-page>
+  </main>
+</wf-app>
+<script type="module">
+import { wf, can, mine, toApprove, guard, statusBadge } from './app.js';
+const first = wf.user?.name.split(' ')[0] || 'there';
+document.getElementById('hello').querySelector('h1').textContent = `Good morning, ${first}`;
+guard(document.getElementById('new'), 'submit', 'Viewers can’t add expenses.');
+const scope = () => (can('admin') || can('view') ? wf.store.all('expenses') : wf.store.where('expenses', mine));
+
+wf.mount('#stats', () => {
+  const mineX = wf.store.where('expenses', mine);
+  const tiles = [];
+  if (can('submit')) {
+    tiles.push(['Drafts to finish', mineX.filter((e) => e.status === 'draft').length]);
+    tiles.push(['Waiting for approval', wf.format.money(mineX.filter((e) => e.status === 'pending').reduce((s, e) => s + e.amount, 0))]);
+  }
+  if (can('approve')) tiles.push(['To approve', toApprove().length]);
+  tiles.push([can('admin') || can('view') ? 'Company spend (30d)' : 'Approved (30d)', wf.format.money(scope().filter((e) => e.status === 'approved').reduce((s, e) => s + e.amount, 0))]);
+  return wf.html`${tiles.map(([l, v]) => wf.html`<wf-stat label="${l}" value="${v}"></wf-stat>`)}`;
+});
+
+const paint = () => {
+  const all = scope();
+  document.getElementById('first-run').hidden = all.length > 0;
+  document.getElementById('overview').hidden = all.length === 0;
+  const weeks = [5, 4, 3, 2, 1, 0].map((w) => all.filter((e) => { const d = (Date.parse('2026-11-25') - Date.parse(e.date)) / 864e5; return d >= w * 7 && d < w * 7 + 7; }).reduce((s, e) => s + e.amount, 0));
+  const chart = document.getElementById('weekly');
+  chart.setAttribute('labels', '6w,5w,4w,3w,2w,This wk');
+  chart.setAttribute('values', weeks.map(Math.round).join(','));
+  const cats = {};
+  all.forEach((e) => { cats[e.category] = (cats[e.category] || 0) + e.amount; });
+  const top = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const donut = document.getElementById('cats');
+  donut.setAttribute('labels', top.map((c) => c[0]).join(','));
+  donut.setAttribute('values', top.map((c) => Math.round(c[1])).join(','));
+};
+paint();
+wf.store.subscribe(paint);
+
+wf.mount('#recent', () => wf.html`${scope().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5).map((e) => wf.html`
+  <wf-list-item icon="receipt" title="${e.merchant} · ${wf.format.money(e.amount)}" meta="${e.by} · ${wf.format.date(e.date)}" href="/expense.html?id=${e.id}">${statusBadge(e.status)}</wf-list-item>`)}`);
+</script>
+</body>
+</html>

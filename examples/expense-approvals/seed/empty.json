@@ -1,0 +1,19 @@
+{
+  "data": {
+    "expenses": [],
+    "team": [
+      {
+        "id": "u_elif",
+        "name": "Elif Novak",
+        "role": "Submitter",
+        "email": "elif@demo.wf"
+      }
+    ],
+    "settings": {
+      "plan": "free",
+      "policyLimit": 150,
+      "currency": "EUR",
+      "company": "Ledgerline Ltd"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Billing · Ledgerline</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="Ledgerline">
+    <wf-nav-item href="/" icon="dashboard">Dashboard</wf-nav-item>
+    <wf-nav-item href="/expenses.html" icon="receipt" id="nav-expenses">My expenses</wf-nav-item>
+    <wf-nav-item href="/approvals.html" icon="inbox" id="nav-approvals">Approvals</wf-nav-item>
+    <wf-nav-group>Company</wf-nav-group>
+    <wf-nav-item href="/team.html" icon="users" id="nav-team">Team</wf-nav-item>
+    <wf-nav-item href="/billing.html" icon="credit-card">Billing</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-topbar><wf-search placeholder="Search expenses" shortcut="⌘/" style="max-width:320px;flex:1"></wf-search><wf-spacer></wf-spacer><button data-icon-only data-variant="ghost" aria-label="Notifications" data-tip="Notifications"><wf-icon name="bell"></wf-icon></button><wf-avatar id="who"></wf-avatar></wf-topbar>
+    <wf-page>
+      <wf-page-header title="Billing" subtitle="Your plan, payment method and invoices."></wf-page-header>
+      <div id="expired" hidden><wf-gate title="Your trial has ended" text="Your data is safe. Choose a plan to add expenses and approve again." action="Choose a plan below" href="#plans"></wf-gate></div>
+      <wf-grid cols="3" id="plans"></wf-grid>
+      <wf-split ratio="1:1">
+        <wf-card title="Payment method"><div id="card"></div></wf-card>
+        <wf-card title="Invoices"><wf-list variant="plain" id="invoices"></wf-list></wf-card>
+      </wf-split>
+    </wf-page>
+  </main>
+</wf-app>
+<script type="module">
+import { wf, can } from './app.js';
+const settings = () => wf.store.value('settings') || {};
+const plans = [
+  { id: 'free', name: 'Free', price: '€0', per: 'up to 3 people', features: ['Expenses and receipts', 'One approver'] },
+  { id: 'pro', name: 'Pro', price: '€6', per: 'per person / month', features: ['Approval rules', 'Policy limits', 'Exports'] },
+  { id: 'enterprise', name: 'Enterprise', price: 'Talk to us', per: 'annual contract', features: ['SSO and 2FA', 'Integrations', 'Audit log'] },
+];
+document.getElementById('expired').hidden = settings().plan !== 'trial_expired';
+wf.mount('#plans', () => wf.html`${plans.map((p) => {
+  const current = settings().plan === p.id;
+  return wf.html`<wf-card ${current ? '' : wf.raw('variant="soft"')}>
+    <wf-row justify="between"><h3>${p.name}</h3>${current ? wf.html`<wf-badge status="done">Current plan</wf-badge>` : ''}</wf-row>
+    <div><span style="font:700 26px var(--wf-font-display)">${p.price}</span> <small>${p.per}</small></div>
+    <wf-stack gap="1">${p.features.map((f) => wf.html`<wf-row gap="2"><wf-icon name="check" size="16"></wf-icon>${f}</wf-row>`)}</wf-stack>
+    ${current ? '' : wf.html`<button data-plan="${p.id}" ${can('admin') ? '' : wf.raw('disabled data-tip="Only admins can change the plan"')}>${p.id === 'enterprise' ? 'Contact sales' : `Switch to ${p.name}`}</button>`}
+  </wf-card>`;
+})}`);
+wf.on('click', '[data-plan]', async (e, el) => {
+  const p = plans.find((x) => x.id === el.dataset.plan);
+  if (await wf.confirm({ title: `Switch to ${p.name}?`, text: `You’ll be charged ${p.price} ${p.per}, from today.`, confirm: 'Switch plan' })) {
+    wf.store.value('settings', { ...settings(), plan: p.id });
+    document.getElementById('expired').hidden = true;
+    wf.toast(`You’re on ${p.name} now`);
+  }
+});
+wf.mount('#card', () => (['free', 'trial_expired'].includes(settings().plan)
+  ? wf.html`<wf-empty icon="credit-card" title="No card on file" text="Add a card to upgrade."><button>Add card</button></wf-empty>`
+  : wf.html`<wf-row justify="between"><wf-row gap="2"><wf-icon name="credit-card"></wf-icon><span class="wf-mono">•••• 4242</span><small>expires 08/28</small></wf-row><button data-size="sm">Update</button></wf-row>`));
+wf.mount('#invoices', () => (['free', 'trial_expired'].includes(settings().plan)
+  ? wf.html`<wf-empty icon="file" title="No invoices yet"></wf-empty>`
+  : wf.html`${['Nov 2026', 'Oct 2026', 'Sep 2026'].map((m, i) => wf.html`<wf-list-item icon="file" title="${m}" meta="Paid · ${wf.format.money(114 - i * 6)}"><button data-size="sm" data-variant="ghost" data-toast="Downloading invoice">PDF</button></wf-list-item>`)}`));
+</script>
+</body>
+</html>

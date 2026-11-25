@@ -1,0 +1,12 @@
+{
+  "name": "wireframe-kit",
+  "description": "Agentic LoFi wireframing for Claude Code.",
+  "owner": { "name": "Deyan Dobrinov" },
+  "plugins": [
+    {
+      "name": "wireframe",
+      "source": "./",
+      "description": "/wireframe: build and iterate working LoFi prototypes with seeded users and on-UI comments."
+    }
+  ]
+}

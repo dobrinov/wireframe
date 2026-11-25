@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Approvals · Ledgerline</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="Ledgerline">
+    <wf-nav-item href="/" icon="dashboard">Dashboard</wf-nav-item>
+    <wf-nav-item href="/expenses.html" icon="receipt" id="nav-expenses">My expenses</wf-nav-item>
+    <wf-nav-item href="/approvals.html" icon="inbox" id="nav-approvals">Approvals</wf-nav-item>
+    <wf-nav-group>Company</wf-nav-group>
+    <wf-nav-item href="/team.html" icon="users" id="nav-team">Team</wf-nav-item>
+    <wf-nav-item href="/billing.html" icon="credit-card">Billing</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-topbar><wf-search placeholder="Search expenses" shortcut="⌘/" style="max-width:320px;flex:1"></wf-search><wf-spacer></wf-spacer><button data-icon-only data-variant="ghost" aria-label="Notifications" data-tip="Notifications"><wf-icon name="bell"></wf-icon></button><wf-avatar id="who"></wf-avatar></wf-topbar>
+    <wf-page>
+      <div id="no-access" hidden><wf-empty icon="lock" title="Approvals are for managers" text="You can see your own expenses and their status under My expenses."><a class="wf-btn" href="/expenses.html">Go to my expenses</a></wf-empty></div>
+      <wf-stack gap="4" id="queue" hidden>
+        <wf-page-header title="Approvals" subtitle="Expenses from your team waiting for a decision.">
+          <button id="bulk-reject" disabled data-open="reject">Reject</button>
+          <button id="bulk-approve" data-variant="primary" disabled data-tip="Select expenses first">Approve selected</button>
+        </wf-page-header>
+        <wf-tabs id="tabs" tabs="Waiting,Over policy,Missing receipt"></wf-tabs>
+        <wf-table id="table" sortable selectable empty="You’re all caught up" empty-text="New expenses from your team will appear here." empty-icon="check">
+          <table>
+            <thead><tr><th>Submitted by</th><th>Merchant</th><th>Date</th><th>Policy</th><th class="wf-num">Amount</th><th data-nosort></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </wf-table>
+      </wf-stack>
+    </wf-page>
+    <wf-modal id="reject" title="Reject selected expenses?">
+      <p>Everyone affected gets an email with your reason.</p>
+      <wf-field label="Reason" id="reason-field"><textarea id="reason" placeholder="e.g. Please attach itemised receipts."></textarea></wf-field>
+      <footer><button data-close>Cancel</button><button data-variant="primary" id="confirm-reject">Reject</button></footer>
+    </wf-modal>
+  </main>
+</wf-app>
+<script type="module">
+import { wf, can, toApprove, guard } from './app.js';
+document.getElementById('no-access').hidden = can('approve');
+document.getElementById('queue').hidden = !can('approve');
+const ui = { tab: 'Waiting' };
+const rows = () => toApprove().filter((e) => ui.tab === 'Waiting' || (ui.tab === 'Over policy' ? e.overPolicy : !e.receipt)).sort((a, b) => a.date.localeCompare(b.date));
+const tabs = document.getElementById('tabs');
+const render = wf.mount('#rows', () => wf.html`${rows().map((e) => wf.html`
+  <tr data-id="${e.id}" data-href="/expense.html?id=${e.id}">
+    <td><wf-row gap="2" nowrap><wf-avatar name="${e.by}" size="26"></wf-avatar>${e.by}</wf-row></td>
+    <td>${e.merchant}<br><small>${e.category}</small></td><td data-sort="${e.date}">${wf.format.shortDate(e.date)}</td>
+    <td>${e.overPolicy ? wf.html`<wf-badge status="problem">Over €150/night</wf-badge>` : !e.receipt ? wf.html`<wf-badge status="problem">No receipt</wf-badge>` : wf.html`<wf-badge>OK</wf-badge>`}</td>
+    <td class="wf-num" data-sort="${e.amount}">${wf.format.money(e.amount)}</td>
+    <td><wf-row gap="1" nowrap><button data-size="sm" data-approve="${e.id}">Approve</button></wf-row></td>
+  </tr>`)}`);
+const counts = () => { const all = toApprove(); tabs.setAttribute('counts', [all.length, all.filter((e) => e.overPolicy).length, all.filter((e) => !e.receipt).length].join(',')); };
+counts();
+wf.store.subscribe(counts);
+tabs.addEventListener('change', (e) => { ui.tab = e.detail.value; render(); });
+
+const table = document.getElementById('table');
+const approve = document.getElementById('bulk-approve');
+const reject = document.getElementById('bulk-reject');
+table.addEventListener('selection', (e) => {
+  const n = e.detail.ids.length;
+  approve.disabled = reject.disabled = !n;
+  approve.textContent = n ? `Approve ${n}` : 'Approve selected';
+  approve.dataset.tip = n ? '' : 'Select expenses first';
+  if (!n) delete approve.dataset.tip;
+});
+guard(approve, 'approve', ''); guard(reject, 'approve', '');
+approve.onclick = () => {
+  const ids = table.selected;
+  ids.forEach((id) => wf.store.update('expenses', id, { status: 'approved' }));
+  approve.disabled = reject.disabled = true;
+  approve.textContent = 'Approve selected';
+  wf.toast(`Approved ${ids.length} expense${ids.length === 1 ? '' : 's'}`, { action: 'Undo', onAction: () => ids.forEach((id) => wf.store.update('expenses', id, { status: 'pending' })) });
+};
+wf.on('click', '[data-approve]', (e, el) => {
+  e.stopPropagation();
+  if (el.disabled) return;
+  wf.store.update('expenses', el.dataset.approve, { status: 'approved' });
+  wf.toast('Approved');
+});
+document.querySelectorAll('[data-approve]').forEach((b) => guard(b, 'approve', ''));
+document.getElementById('confirm-reject').onclick = () => {
+  const reason = document.getElementById('reason').value.trim();
+  document.getElementById('reason-field').setAttribute('error', reason ? '' : 'Give a reason');
+  if (!reason) return;
+  const ids = table.selected;
+  ids.forEach((id) => wf.store.update('expenses', id, { status: 'rejected', reason }));
+  wf.close('reject');
+  wf.toast(`Rejected ${ids.length}`);
+};
+</script>
+</body>
+</html>

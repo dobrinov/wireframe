@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team · Ledgerline</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="Ledgerline">
+    <wf-nav-item href="/" icon="dashboard">Dashboard</wf-nav-item>
+    <wf-nav-item href="/expenses.html" icon="receipt" id="nav-expenses">My expenses</wf-nav-item>
+    <wf-nav-item href="/approvals.html" icon="inbox" id="nav-approvals">Approvals</wf-nav-item>
+    <wf-nav-group>Company</wf-nav-group>
+    <wf-nav-item href="/team.html" icon="users" id="nav-team">Team</wf-nav-item>
+    <wf-nav-item href="/billing.html" icon="credit-card">Billing</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-topbar><wf-search placeholder="Search expenses" shortcut="⌘/" style="max-width:320px;flex:1"></wf-search><wf-spacer></wf-spacer><button data-icon-only data-variant="ghost" aria-label="Notifications" data-tip="Notifications"><wf-icon name="bell"></wf-icon></button><wf-avatar id="who"></wf-avatar></wf-topbar>
+    <wf-page>
+      <div id="no-access" hidden><wf-empty icon="lock" title="Only admins manage the team" text="Ask your finance admin to invite people or change roles."></wf-empty></div>
+      <wf-stack gap="4" id="team" hidden>
+        <wf-page-header title="Team" id="head"><button data-variant="primary" data-open="invite" id="invite-btn"><wf-icon name="plus" size="16"></wf-icon>Invite people</button></wf-page-header>
+        <wf-row><wf-search id="q" placeholder="Search people" style="max-width:320px;flex:1"></wf-search><wf-segmented id="role" options="Everyone,Approvers,Submitters"></wf-segmented></wf-row>
+        <wf-table sortable empty="No one matches" empty-icon="users">
+          <table><thead><tr><th>Name</th><th>Role</th><th>Email</th><th data-nosort></th></tr></thead><tbody id="rows"></tbody></table>
+        </wf-table>
+        <wf-pagination id="pager" per-page="10"></wf-pagination>
+      </wf-stack>
+    </wf-page>
+    <wf-modal id="invite" title="Invite people">
+      <wf-field label="Email addresses" help="Press Enter after each address"><wf-tags id="emails" placeholder="name@company.com"></wf-tags></wf-field>
+      <wf-field label="Role"><select id="invite-role"><option>Submitter</option><option>Approver</option><option>Admin</option></select></wf-field>
+      <footer><button data-close>Cancel</button><button data-variant="primary" id="send-invites">Send invites</button></footer>
+    </wf-modal>
+  </main>
+</wf-app>
+<script type="module">
+import { wf, can, guard } from './app.js';
+const allowed = can('admin') || can('view');
+document.getElementById('no-access').hidden = allowed;
+document.getElementById('team').hidden = !allowed;
+const admin = can('admin');
+if (!admin) document.getElementById('invite-btn').remove(); else guard(document.getElementById('invite-btn'), 'admin', '');
+const ui = { q: '', role: 'Everyone', page: 1 };
+const per = 10;
+const pager = document.getElementById('pager');
+const list = () => wf.store.all('team').filter((p) => (ui.role === 'Everyone' || `${p.role}s` === ui.role) && p.name.toLowerCase().includes(ui.q.toLowerCase()));
+const render = wf.mount('#rows', () => {
+  const all = list();
+  pager.hidden = all.length <= per;
+  pager.setAttribute('total', all.length);
+  pager.setAttribute('page', ui.page);
+  document.getElementById('head').querySelector('h1').textContent = `Team · ${wf.store.count('team')}`;
+  return wf.html`${all.slice((ui.page - 1) * per, ui.page * per).map((p) => wf.html`
+    <tr data-id="${p.id}"><td><wf-row gap="2" nowrap><wf-avatar name="${p.name}" size="28"></wf-avatar><b>${p.name}</b></wf-row></td><td>${p.role === 'Approver' || p.role === 'Admin' ? wf.html`<wf-badge status="done">${p.role}</wf-badge>` : wf.html`<wf-badge>${p.role}</wf-badge>`}</td><td class="wf-mono">${p.email}</td>
+    <td>${admin ? wf.html`<wf-menu align="right" aria-label="Actions for ${p.name}" data-person="${p.id}"><wf-menu-item value="Approver">Make approver</wf-menu-item><wf-menu-item value="Submitter">Make submitter</wf-menu-item><hr><wf-menu-item variant="danger" value="remove">Remove from team</wf-menu-item></wf-menu>` : ''}</td></tr>`)}`;
+});
+document.getElementById('q').addEventListener('search', (e) => { ui.q = e.detail.value; ui.page = 1; render(); });
+document.getElementById('role').addEventListener('change', (e) => { ui.role = e.detail.value; ui.page = 1; render(); });
+pager.addEventListener('change', (e) => { ui.page = e.detail.page; render(); });
+document.addEventListener('select', async (e) => {
+  const menu = e.target.closest?.('[data-person]');
+  if (!menu) return;
+  const id = menu.dataset.person;
+  const p = wf.store.get('team', id);
+  if (e.detail.value === 'remove') {
+    if (await wf.confirm({ title: `Remove ${p.name}?`, text: 'They lose access straight away. Their expenses stay.', confirm: 'Remove', danger: true })) { wf.store.remove('team', id); wf.toast(`${p.name} removed`); }
+  } else { wf.store.update('team', id, { role: e.detail.value }); wf.toast(`${p.name} is now ${e.detail.value.toLowerCase()}`); }
+});
+document.getElementById('send-invites').onclick = () => {
+  const emails = document.getElementById('emails').value;
+  if (!emails.length) return wf.toast('Add at least one email', { variant: 'problem' });
+  const role = document.getElementById('invite-role').value;
+  emails.forEach((email) => wf.store.add('team', { name: email.split('@')[0].replace(/\W+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()), email, role }));
+  wf.close('invite');
+  wf.toast(`Invited ${emails.length} ${emails.length === 1 ? 'person' : 'people'}`);
+};
+</script>
+</body>
+</html>

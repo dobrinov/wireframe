@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expense · Ledgerline</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="Ledgerline">
+    <wf-nav-item href="/" icon="dashboard">Dashboard</wf-nav-item>
+    <wf-nav-item href="/expenses.html" icon="receipt" id="nav-expenses">My expenses</wf-nav-item>
+    <wf-nav-item href="/approvals.html" icon="inbox" id="nav-approvals">Approvals</wf-nav-item>
+    <wf-nav-group>Company</wf-nav-group>
+    <wf-nav-item href="/team.html" icon="users" id="nav-team">Team</wf-nav-item>
+    <wf-nav-item href="/billing.html" icon="credit-card">Billing</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-topbar><wf-search placeholder="Search expenses" shortcut="⌘/" style="max-width:320px;flex:1"></wf-search><wf-spacer></wf-spacer><button data-icon-only data-variant="ghost" aria-label="Notifications" data-tip="Notifications"><wf-icon name="bell"></wf-icon></button><wf-avatar id="who"></wf-avatar></wf-topbar>
+    <wf-page>
+      <div id="missing" hidden><wf-empty variant="error" icon="search" title="This expense doesn’t exist" text="It may have been deleted, or it belongs to another user."><a class="wf-btn" href="/expenses.html">Back to expenses</a></wf-empty></div>
+      <div id="detail" hidden>
+        <wf-stack gap="6">
+          <wf-page-header id="head" title="Expense" crumbs="Expenses|/expenses.html / Detail">
+            <span id="actions" style="display:contents"></span>
+          </wf-page-header>
+          <div id="alerts" style="display:flex;flex-direction:column;gap:8px"></div>
+          <wf-split ratio="2:1">
+            <wf-card title="Details"><dl id="facts"></dl></wf-card>
+            <wf-stack gap="4">
+              <wf-card title="Receipt" id="receipt"></wf-card>
+              <wf-card title="History"><wf-timeline id="history"></wf-timeline></wf-card>
+            </wf-stack>
+          </wf-split>
+        </wf-stack>
+      </div>
+    </wf-page>
+    <wf-modal id="reject" title="Reject this expense?">
+      <p>The submitter gets an email with your reason and can fix and resubmit.</p>
+      <wf-field label="Reason" id="reason-field"><textarea id="reason" placeholder="e.g. Please attach the itemised receipt."></textarea></wf-field>
+      <footer><button data-close>Cancel</button><button data-variant="primary" id="confirm-reject">Reject expense</button></footer>
+    </wf-modal>
+  </main>
+</wf-app>
+<script type="module">
+import { wf, can, mine, guard, statusBadge, readOnly } from './app.js';
+const id = wf.params.id;
+const paint = () => {
+  const e = wf.store.get('expenses', id);
+  document.getElementById('missing').hidden = !!e;
+  document.getElementById('detail').hidden = !e;
+  if (!e) return;
+  const head = document.getElementById('head');
+  head.querySelector('h1').textContent = `${e.merchant} · ${wf.format.money(e.amount)}`;
+  head.querySelector('wf-breadcrumbs').lastElementChild.textContent = e.merchant;
+  const own = mine(e);
+  const approvable = e.status === 'pending' && !own && can('approve');
+  document.getElementById('actions').innerHTML = String(wf.html`
+    ${own && e.status === 'draft' ? wf.html`<button id="del" data-variant="danger">Delete draft</button><button id="send" data-variant="primary">Submit for approval</button>` : ''}
+    ${own && e.status === 'rejected' ? wf.html`<button id="send" data-variant="primary">Fix &amp; resubmit</button>` : ''}
+    ${approvable ? wf.html`<button data-open="reject">Reject</button><button id="approve" data-variant="primary">Approve</button>` : ''}
+    ${!own && e.status === 'pending' && !can('approve') ? wf.html`<button disabled data-tip="Only managers can approve">Approve</button>` : ''}`);
+  ['send', 'del'].forEach((b) => guard(document.getElementById(b), 'submit', ''));
+  guard(document.getElementById('approve'), 'approve', '');
+  document.getElementById('alerts').innerHTML = String(wf.html`
+    ${e.status === 'rejected' ? wf.html`<wf-alert variant="problem" title="Rejected">${e.reason}</wf-alert>` : ''}
+    ${e.overPolicy ? wf.html`<wf-alert variant="warning" title="Over policy">Lodging is limited to €150 a night. The approver will see this flag.</wf-alert>` : ''}
+    ${!e.receipt && e.status !== 'approved' ? wf.html`<wf-alert variant="warning" title="No receipt">Expenses over €25 need a receipt before they can be approved.</wf-alert>` : ''}`);
+  document.getElementById('facts').innerHTML = String(wf.html`
+    <dt>Status</dt><dd>${statusBadge(e.status)}</dd><dt>Amount</dt><dd><b>${wf.format.money(e.amount)}</b></dd><dt>Merchant</dt><dd>${e.merchant}</dd>
+    <dt>Category</dt><dd>${e.category}</dd><dt>Date</dt><dd>${wf.format.date(e.date)}</dd><dt>Submitted by</dt><dd>${e.by}</dd>
+    <dt>Reference</dt><dd class="wf-mono">${e.id.toUpperCase()}</dd>${e.note ? wf.html`<dt>Note</dt><dd>${e.note}</dd>` : ''}`);
+  const rc = document.getElementById('receipt');
+  [...rc.children].slice(1).forEach((n) => n.remove());
+  rc.insertAdjacentHTML('beforeend', String(e.receipt ? wf.html`<wf-image label="receipt-${e.id}.jpg" ratio="3:4" style="max-width:200px"></wf-image><wf-file name="receipt-${e.id}.jpg" size="312 KB"></wf-file>`
+    : wf.html`<wf-empty icon="upload" title="No receipt yet" text="${own ? 'Drop a photo or PDF here.' : 'Ask the submitter to add one.'}"></wf-empty>`));
+  const steps = [['Created', e.date, true]];
+  if (e.status !== 'draft') steps.push(['Submitted', e.date, true]);
+  if (e.status === 'approved') steps.push(['Approved', e.date, true]);
+  if (e.status === 'rejected') steps.push(['Rejected', e.date, true]);
+  if (e.status === 'pending') steps.push(['Waiting for approval', '', false]);
+  document.getElementById('history').innerHTML = String(wf.html`${steps.reverse().map(([t, d, done]) => wf.html`<wf-timeline-item title="${t}" meta="${d ? wf.format.date(d) : 'Now'}" ${done ? wf.raw('done') : ''}></wf-timeline-item>`)}`);
+};
+paint();
+wf.store.subscribe(paint);
+wf.on('click', '#send', () => { wf.store.update('expenses', id, { status: 'pending', reason: undefined }); wf.toast('Submitted to your manager'); });
+wf.on('click', '#approve', () => { wf.store.update('expenses', id, { status: 'approved' }); wf.toast('Expense approved', { action: 'Undo', onAction: () => wf.store.update('expenses', id, { status: 'pending' }) }); });
+wf.on('click', '#del', async () => { if (await wf.confirm({ title: 'Delete this draft?', text: 'This can’t be undone.', confirm: 'Delete', danger: true })) { wf.store.remove('expenses', id); wf.go('/expenses.html'); } });
+document.getElementById('confirm-reject').onclick = () => {
+  const reason = document.getElementById('reason').value.trim();
+  document.getElementById('reason-field').setAttribute('error', reason ? '' : 'Give the submitter a reason');
+  if (!reason) return;
+  wf.store.update('expenses', id, { status: 'rejected', reason });
+  wf.close('reject');
+  wf.toast('Expense rejected');
+};
+</script>
+</body>
+</html>

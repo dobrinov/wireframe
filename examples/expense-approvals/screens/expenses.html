@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My expenses · Ledgerline</title>
+<link rel="stylesheet" href="/_wf/wf.css">
+<script type="module" src="/_wf/wf.js"></script>
+</head>
+<body class="wf">
+<wf-app>
+  <wf-sidebar brand="Ledgerline">
+    <wf-nav-item href="/" icon="dashboard">Dashboard</wf-nav-item>
+    <wf-nav-item href="/expenses.html" icon="receipt" id="nav-expenses">My expenses</wf-nav-item>
+    <wf-nav-item href="/approvals.html" icon="inbox" id="nav-approvals">Approvals</wf-nav-item>
+    <wf-nav-group>Company</wf-nav-group>
+    <wf-nav-item href="/team.html" icon="users" id="nav-team">Team</wf-nav-item>
+    <wf-nav-item href="/billing.html" icon="credit-card">Billing</wf-nav-item>
+  </wf-sidebar>
+  <main>
+    <wf-topbar><wf-search placeholder="Search expenses" shortcut="⌘/" style="max-width:320px;flex:1"></wf-search><wf-spacer></wf-spacer><button data-icon-only data-variant="ghost" aria-label="Notifications" data-tip="Notifications"><wf-icon name="bell"></wf-icon></button><wf-avatar id="who"></wf-avatar></wf-topbar>
+    <wf-page>
+      <wf-page-header id="head" title="My expenses" subtitle="Drafts stay private until you submit them."><button data-icon-only aria-label="Export" data-tip="Export CSV" data-toast="Export started. You’ll get an email."><wf-icon name="download"></wf-icon></button><button data-variant="primary" data-open="new-expense" id="new"><wf-icon name="plus" size="16"></wf-icon>New expense</button></wf-page-header>
+      <wf-tabs id="tabs" tabs="All,Drafts,Pending,Approved,Rejected"></wf-tabs>
+      <wf-table id="table" sortable empty="No expenses here" empty-text="Expenses you add show up in this list." empty-icon="receipt">
+        <table>
+          <thead><tr><th>Merchant</th><th>Category</th><th>Date</th><th id="by-col">Submitted by</th><th>Status</th><th>Receipt</th><th class="wf-num">Amount</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </wf-table>
+      <wf-pagination id="pager" per-page="15" hidden></wf-pagination>
+    </wf-page>
+    <wf-modal id="new-expense" title="New expense" width="520">
+      <form class="wf-form" id="form">
+        <wf-field label="Merchant" required><wf-combobox name="merchant" options="Coastline Rail, Harbour Hotel, Stack Software, Bistro 9, Cab Co., Skyway Air" placeholder="Where did you spend?"></wf-combobox></wf-field>
+        <wf-grid cols="2" gap="2">
+          <wf-field label="Amount (EUR)" required><input name="amount" type="number" step="0.01" min="0" placeholder="0.00"></wf-field>
+          <wf-field label="Date"><input name="date" type="date" value="2026-11-25"></wf-field>
+        </wf-grid>
+        <wf-field label="Category"><select name="category"><option>Travel</option><option>Lodging</option><option>Meals</option><option>Software</option><option>Office</option></select></wf-field>
+        <wf-upload label="Drop the receipt" hint="PDF, JPG or PNG"></wf-upload>
+        <wf-field label="Note for your manager" optional><textarea name="note" style="min-height:64px"></textarea></wf-field>
+      </form>
+      <footer><button data-close>Cancel</button><button id="save-draft">Save draft</button><button data-variant="primary" id="submit">Submit for approval</button></footer>
+    </wf-modal>
+  </main>
+</wf-app>
+<script type="module">
+import { wf, can, mine, guard, statusBadge } from './app.js';
+const viewer = !can('submit');
+const ui = { tab: 'All', page: 1 };
+const per = 15;
+if (viewer) {
+  const h = document.getElementById('head');
+  h.querySelector('h1').textContent = 'All expenses';
+  h.querySelector('p').textContent = 'Read-only view of submitted company expenses.';
+}
+if (can('admin') && !viewer) {
+  const h = document.getElementById('head');
+  h.querySelector('h1').textContent = 'Company expenses';
+  h.querySelector('p').textContent = 'Everything your team has added. Your own drafts stay private until submitted.';
+}
+if (!viewer && !can('admin')) document.getElementById('by-col').remove();
+guard(document.getElementById('new'), 'submit', 'Viewers can’t add expenses.');
+const showBy = viewer || can('admin');
+const scope = () => (viewer || can('admin') ? wf.store.all('expenses') : wf.store.where('expenses', mine));
+const map = { Drafts: 'draft', Pending: 'pending', Approved: 'approved', Rejected: 'rejected' };
+const rows = () => scope().filter((e) => ui.tab === 'All' || e.status === map[ui.tab]).sort((a, b) => b.date.localeCompare(a.date));
+
+const tabs = document.getElementById('tabs');
+const pager = document.getElementById('pager');
+const counts = () => tabs.setAttribute('counts', ['All', 'Drafts', 'Pending', 'Approved', 'Rejected'].map((t) => scope().filter((e) => t === 'All' || e.status === map[t]).length).join(','));
+const render = wf.mount('#rows', () => {
+  const all = rows();
+  pager.hidden = all.length <= per;
+  pager.setAttribute('total', all.length);
+  pager.setAttribute('page', ui.page);
+  return wf.html`${all.slice((ui.page - 1) * per, ui.page * per).map((e) => wf.html`
+    <tr data-id="${e.id}" data-href="/expense.html?id=${e.id}">
+      <td><b>${e.merchant}</b>${e.overPolicy ? wf.html` <wf-badge status="problem">Over policy</wf-badge>` : ''}</td><td>${e.category}</td><td data-sort="${e.date}">${wf.format.shortDate(e.date)}</td>
+      ${showBy ? wf.html`<td>${e.by}</td>` : ''}<td>${statusBadge(e.status)}</td>
+      <td>${e.receipt ? 'Attached' : wf.html`<span data-tip="Add a receipt before submitting">✕ Missing</span>`}</td><td class="wf-num" data-sort="${e.amount}">${wf.format.money(e.amount)}</td>
+    </tr>`)}`;
+});
+counts();
+wf.store.subscribe(counts);
+tabs.addEventListener('change', (e) => { ui.tab = e.detail.value; ui.page = 1; render(); });
+pager.addEventListener('change', (e) => { ui.page = e.detail.page; render(); });
+
+const form = document.getElementById('form');
+const save = (status) => {
+  const v = wf.formData(form);
+  v.merchant = form.querySelector('wf-combobox').value || form.querySelector('wf-combobox input').value;
+  const fields = form.querySelectorAll('wf-field');
+  fields[0].setAttribute('error', v.merchant ? '' : 'Tell us where you spent it');
+  fields[1].setAttribute('error', Number(v.amount) > 0 ? '' : 'Enter an amount');
+  if (!v.merchant || !(Number(v.amount) > 0)) return;
+  const receipt = form.querySelector('wf-upload').files.length > 0;
+  wf.store.add('expenses', { merchant: v.merchant, amount: Number(v.amount), date: v.date, category: v.category, note: v.note, receipt, status, by: wf.user.name, byId: wf.user.memberId, overPolicy: v.category === 'Lodging' && Number(v.amount) > 270 });
+  wf.close('new-expense');
+  form.reset();
+  wf.toast(status === 'draft' ? 'Draft saved' : 'Submitted to your manager');
+};
+document.getElementById('save-draft').onclick = () => save('draft');
+document.getElementById('submit').onclick = () => save('pending');
+if (wf.params.new && can('submit')) wf.open('new-expense');
+</script>
+</body>
+</html>
