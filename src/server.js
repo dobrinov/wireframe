@@ -6,7 +6,7 @@ import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import {
   KIT_ROOT, paths, loadUsers, loadSeed, loadComments, addComment, updateComment, deleteComment,
-  pending, formatForAgent, writeJSON, loadConfig,
+  pending, formatForAgent, writeJSON, loadConfig, saveAttachment, attachmentPath, MAX_IMAGE_BYTES,
 } from './project.js';
 
 const TYPES = {
@@ -111,7 +111,7 @@ export async function serve({ root, port = 4321, open = false, library = false, 
       const info = [...watchers].map((w) => w.wfInfo).find(Boolean);
       if (run && run.kind === 'session') { run.ids.push(...items.map((c) => c.id)); step(`Received #${items.map((c) => c.id).join(', #')}`); }
       else startRun('session', items.map((c) => c.id), info || { label: 'Claude Code session', cwd: root });
-      send(watchers, 'items', items.map((c) => ({ ...c, text: formatForAgent(c) })));
+      send(watchers, 'items', items.map((c) => ({ ...c, text: formatForAgent(c, root) })));
       broadcastComments();
       return;
     }
@@ -136,7 +136,7 @@ export async function serve({ root, port = 4321, open = false, library = false, 
       const prompt = [
         'You are the /sketch agent for the LoFi prototype in this folder. No interactive session was listening, so you were started to handle comments left on the prototype.',
         'Read WIREFRAME.md, then follow the wireframe skill (style rules and components). For each comment below: make the change in screens/ or seed/, keep it LoFi and on-library, then run the reply command it shows with a one-line summary.',
-        '', ...queued.map((c) => formatForAgent({ ...c, status: 'working' })),
+        '', ...queued.map((c) => formatForAgent({ ...c, status: 'working' }, root)),
       ].join('\n');
       const logFd = fs.openSync(p.headlessLog, 'a');
       fs.writeSync(logFd, `\n===== ${new Date().toISOString()} headless run for #${queued.map((c) => c.id).join(', #')}\n`);
@@ -243,6 +243,12 @@ export async function serve({ root, port = 4321, open = false, library = false, 
         if (c.status === 'queued') scheduleFlush();
         return json(res, 201, c);
       }
+      if (route === '/_wf/api/attachments' && req.method === 'POST') {
+        if (!root) return json(res, 400, { error: 'no project' });
+        const name = saveAttachment(root, await raw(req, MAX_IMAGE_BYTES), req.headers['content-type'] || '');
+        return json(res, 201, { name, url: `/_wf/attachments/${name}` });
+      }
+      if (route.startsWith('/_wf/attachments/')) return file(res, root && attachmentPath(root, route.slice(17)), false);
       const m = route.match(/^\/_wf\/api\/comments\/(\d+)$/);
       if (m && req.method === 'PATCH') {
         const patch = await body(req);
@@ -342,6 +348,16 @@ function body(req) {
     let s = '';
     req.on('data', (d) => { s += d; if (s.length > 1e6) req.destroy(); });
     req.on('end', () => { try { resolve(s ? JSON.parse(s) : {}); } catch { reject(new Error('invalid JSON')); } });
+    req.on('error', reject);
+  });
+}
+
+function raw(req, max) {
+  return new Promise((resolve, reject) => {
+    const parts = [];
+    let n = 0;
+    req.on('data', (d) => { n += d.length; if (n > max) { reject(new Error('image is larger than 10 MB')); req.destroy(); } else parts.push(d); });
+    req.on('end', () => resolve(Buffer.concat(parts)));
     req.on('error', reject);
   });
 }

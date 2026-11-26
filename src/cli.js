@@ -165,7 +165,7 @@ async function cmdWatch(dir, flags) {
   }
   const info = runningServer(root);
   const print = (items) => {
-    for (const c of items) console.log((c.text || formatForAgent(c)) + '\n');
+    for (const c of items) console.log((c.text || formatForAgent(c, root)) + '\n');
   };
   if (!info) {
     // No server: poll the files directly.
@@ -210,7 +210,7 @@ function cmdInbox(dir, flags) {
   const items = pending(root);
   if (flags.json) return console.log(JSON.stringify(items, null, 2));
   if (!items.length) return console.log('Nothing waiting for the agent.');
-  for (const c of items) console.log(formatForAgent(c) + '\n');
+  for (const c of items) console.log(formatForAgent(c, root) + '\n');
 }
 
 async function cmdReply(args, flags) {

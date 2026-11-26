@@ -18,6 +18,7 @@ export function paths(root) {
     meta,
     comments: path.join(meta, 'comments.json'),
     inbox: path.join(meta, 'inbox'),
+    attachments: path.join(meta, 'attachments'),
     history: path.join(meta, 'history'),
     server: path.join(meta, 'server.json'),
     config: path.join(meta, 'config.json'),
@@ -33,7 +34,7 @@ export function isProject(dir) {
 
 // Runtime files that stay out of git when a prototype lives inside a code repository.
 export const META_GITIGNORE = `# Written by wf. Runtime files stay out of git;
-# comments.json (decisions and their reasons) and config.json are worth keeping.
+# comments.json (decisions and their reasons), attachments/ and config.json are worth keeping.
 server.json
 inbox/
 history/
@@ -181,14 +182,43 @@ function syncInbox(root, list) {
 
 const clean = (s, max = 4000) => String(s ?? '').slice(0, max);
 
+// ---- attachments (images pasted into comments) --------------------------
+export const IMAGE_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp' };
+export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const IMAGE_NAME = /^[a-z0-9-]{6,64}\.(png|jpg|gif|webp)$/;
+
+export function saveAttachment(root, buf, type) {
+  const ext = IMAGE_TYPES[String(type).split(';')[0].trim().toLowerCase()];
+  if (!ext) throw new Error('only PNG, JPEG, GIF and WebP images can be attached');
+  if (!buf.length) throw new Error('image is empty');
+  if (buf.length > MAX_IMAGE_BYTES) throw new Error('image is larger than 10 MB');
+  const dir = paths(root).attachments;
+  fs.mkdirSync(dir, { recursive: true });
+  const name = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  fs.writeFileSync(path.join(dir, name), buf);
+  return name;
+}
+
+export function attachmentPath(root, name) {
+  return IMAGE_NAME.test(String(name)) ? path.join(paths(root).attachments, name) : null;
+}
+
+// Keep only names of images that were really uploaded to this project.
+function cleanImages(root, list) {
+  if (!Array.isArray(list)) return [];
+  return [...new Set(list)].filter((n) => { const f = attachmentPath(root, n); return f && fs.existsSync(f); }).slice(0, 8);
+}
+
 export function addComment(root, input) {
   const list = loadComments(root);
   const now = new Date().toISOString();
   const body = clean(input.body).trim();
-  if (!body) throw new Error('comment body is empty');
+  const images = cleanImages(root, input.images);
+  if (!body && !images.length) throw new Error('comment body is empty');
   const c = {
     id: list.reduce((m, x) => Math.max(m, x.id), 0) + 1,
     body,
+    images: images.length ? images : undefined,
     screen: clean(input.screen, 300),
     title: clean(input.title, 200),
     host: input.host ? clean(input.host, 300) : undefined,
@@ -219,7 +249,11 @@ export function updateComment(root, id, patch) {
   const c = list.find((x) => x.id === Number(id));
   if (!c) throw new Error(`comment #${id} not found`);
   if (patch.reply) {
-    c.replies.push({ by: patch.reply.by === 'agent' ? 'agent' : 'user', name: clean(patch.reply.name, 120), body: clean(patch.reply.body), at: new Date().toISOString() });
+    const images = cleanImages(root, patch.reply.images);
+    const body = clean(patch.reply.body).trim();
+    if (body || images.length) {
+      c.replies.push({ by: patch.reply.by === 'agent' ? 'agent' : 'user', name: clean(patch.reply.name, 120), body, ...(images.length ? { images } : {}), at: new Date().toISOString() });
+    }
   }
   if (patch.sendToAgent === true && c.status !== 'resolved') { c.sendToAgent = true; c.status = 'queued'; }
   if (patch.status && ['open', 'queued', 'working', 'resolved'].includes(patch.status)) c.status = patch.status;
@@ -237,15 +271,26 @@ export function updateComment(root, id, patch) {
 }
 
 export function deleteComment(root, id) {
-  const list = loadComments(root).filter((x) => x.id !== Number(id));
+  const all = loadComments(root);
+  const gone = all.find((x) => x.id === Number(id));
+  const list = all.filter((x) => x !== gone);
   saveComments(root, list);
+  // Remove images no remaining comment uses.
+  const used = new Set(list.flatMap(imagesOf));
+  for (const n of gone ? imagesOf(gone) : []) {
+    const f = !used.has(n) && attachmentPath(root, n);
+    if (f) fs.rmSync(f, { force: true });
+  }
 }
+
+const imagesOf = (c) => [...(c.images || []), ...(c.replies || []).flatMap((r) => r.images || [])];
 
 export function pending(root) {
   return loadComments(root).filter((c) => c.status === 'queued' || c.status === 'working');
 }
 
-export function formatForAgent(c) {
+export function formatForAgent(c, root) {
+  const img = (n) => (root && attachmentPath(root, n)) || `.wireframe/attachments/${n}`;
   const lines = [
     `── Comment #${c.id} · ${c.status} ──────────────────────────`,
     `Screen:   screens${c.screen && c.screen !== '/' ? c.screen : '/index.html'}${c.title ? `  (“${c.title}”)` : ''}`,
@@ -253,8 +298,12 @@ export function formatForAgent(c) {
   if (c.anchor?.selector) lines.push(`Element:  ${c.anchor.selector}${c.anchor.text ? `  “${c.anchor.text}”` : ''}`);
   if (c.as) lines.push(`Viewed as: ${c.as.name} (${c.as.id}${c.as.role ? `, ${c.as.role}` : ''})`);
   if (c.viewport) lines.push(`Viewport: ${c.viewport}`);
-  lines.push('', c.body);
-  for (const r of c.replies || []) lines.push('', `${r.by === 'agent' ? 'Agent' : r.name || 'User'}: ${r.body}`);
+  if (c.body) lines.push('', c.body);
+  for (const n of c.images || []) lines.push(`Image:    ${img(n)}`);
+  for (const r of c.replies || []) {
+    lines.push('', `${r.by === 'agent' ? 'Agent' : r.name || 'User'}: ${r.body}`);
+    for (const n of r.images || []) lines.push(`Image:    ${img(n)}`);
+  }
   lines.push('', `When done: wf reply ${c.id} "<what you changed>" --resolve`);
   return lines.join('\n');
 }

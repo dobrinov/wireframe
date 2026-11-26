@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { addComment, updateComment, pending, loadSeed, loadUsers, paths } from '../src/project.js';
+import { addComment, updateComment, deleteComment, pending, loadSeed, loadUsers, paths, saveAttachment, formatForAgent } from '../src/project.js';
 import { lint } from '../src/lint.js';
 
 const WF = path.resolve('bin/wf.js');
@@ -47,6 +47,24 @@ test('comments not sent to the agent stay out of the inbox until sent', () => {
 
 test('empty comments are rejected', () => {
   assert.throws(() => addComment(newProject(), { body: '   ' }), /empty/);
+});
+
+test('pasted images attach to comments and replies, reach the agent, and go with the comment', () => {
+  const root = newProject();
+  const png = Buffer.from('89504e470d0a1a0a', 'hex');
+  const a = saveAttachment(root, png, 'image/png');
+  const b = saveAttachment(root, png, 'image/png');
+  assert.throws(() => saveAttachment(root, png, 'text/html'), /PNG/);
+  const c = addComment(root, { body: '', images: [a, '../../etc/passwd', 'missing.png'], screen: '/' });
+  assert.deepEqual(c.images, [a]);
+  const r = updateComment(root, c.id, { reply: { by: 'user', body: '', images: [b] } });
+  assert.deepEqual(r.replies[0].images, [b]);
+  const text = formatForAgent(r, root);
+  assert.ok(text.includes(path.join(paths(root).attachments, a)));
+  assert.ok(text.includes(path.join(paths(root).attachments, b)));
+  deleteComment(root, c.id);
+  assert.ok(!fs.existsSync(path.join(paths(root).attachments, a)));
+  assert.ok(!fs.existsSync(path.join(paths(root).attachments, b)));
 });
 
 test('seed loading merges shared data and refuses files outside seed/', () => {
