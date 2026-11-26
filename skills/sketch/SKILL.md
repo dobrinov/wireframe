@@ -57,7 +57,7 @@ Prototypes show a banner when a new version is out, telling people to type `/ske
 3. If a step fails, tell the person to type `/plugin`, open **Installed → wireframe** and choose **Update**.
 4. After it updates, summarise the new version's changes in two or three plain lines, then say: "Restart Claude Code (quit and open it again) so the new version loads. Your prototypes switch over the next time you open them with /sketch."
 
-You keep running the old version until the restart, so don't start building with it after an update. Running prototype servers from an older version are replaced automatically by `wf serve`, and open browser tabs reload by themselves.
+You keep running the old version until the restart, so don't start building with it after an update. Running prototype servers from an older version are replaced automatically by `wf serve`, and open browser tabs reload by themselves (tabs opened on 0.1.0 don't: ask the user to refresh them once).
 
 ## 3. New prototype
 

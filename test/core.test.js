@@ -149,10 +149,11 @@ test('updateInfo reports newer releases from the published changelog and caches 
   let hits = 0;
   const srv = http.createServer((req, res) => { hits++; res.end('## 9.1.0 · 2030-01-01\n- Newest\n## 9.0.0\n- Newer\n## 0.0.1\n- Old\n'); });
   await new Promise((r) => srv.listen(0, '127.0.0.1', r));
-  const env = { url: process.env.WF_UPDATE_URL, cache: process.env.WF_UPDATE_CACHE, ci: process.env.CI };
+  const env = { url: process.env.WF_UPDATE_URL, cache: process.env.WF_UPDATE_CACHE, ci: process.env.CI, off: process.env.WF_NO_UPDATE_CHECK };
   process.env.WF_UPDATE_URL = `http://127.0.0.1:${srv.address().port}/CHANGELOG.md`;
   process.env.WF_UPDATE_CACHE = path.join(tmp(), 'update-check.json');
   delete process.env.CI;
+  delete process.env.WF_NO_UPDATE_CHECK;
   try {
     const u = await updateInfo({ current: '1.0.0' });
     assert.equal(u.available, true);
@@ -160,10 +161,12 @@ test('updateInfo reports newer releases from the published changelog and caches 
     assert.deepEqual(u.news.map((r) => r.version), ['9.1.0', '9.0.0']);
     assert.equal((await updateInfo({ current: '9.1.0' })).available, false);
     assert.equal(hits, 1, 'second check should come from the cache');
-    assert.equal((await updateInfo({ current: '1.0.0', config: { updateCheck: false } })).checked, false);
+    const off = await updateInfo({ current: '1.0.0', config: { updateCheck: false } });
+    assert.equal(off.checked, false);
+    assert.equal(off.disabled, true);
   } finally {
     srv.close();
-    for (const [k, v] of [['WF_UPDATE_URL', env.url], ['WF_UPDATE_CACHE', env.cache], ['CI', env.ci]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+    for (const [k, v] of [['WF_UPDATE_URL', env.url], ['WF_UPDATE_CACHE', env.cache], ['CI', env.ci], ['WF_NO_UPDATE_CHECK', env.off]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
   }
 });
 

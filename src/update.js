@@ -10,6 +10,8 @@ export const CHANGELOG_URL = 'https://raw.githubusercontent.com/dobrinov/wirefra
 export const UPDATE_COMMANDS = ['claude plugin marketplace update dobrinov', 'claude plugin update wireframe@dobrinov'];
 const CACHE = path.join(os.homedir(), '.wireframe', 'update-check.json');
 const MAX_AGE_MS = 12 * 60 * 60 * 1000;
+const RETRY_MS = 60 * 60 * 1000; // after a failed check (offline, firewall), wait this long before trying again
+const inflight = new Map();
 
 export const VERSION = readJSON(path.join(KIT_ROOT, 'package.json')).version;
 
@@ -48,10 +50,20 @@ export function updateCheckDisabled(config = {}) {
 
 // The newest published changelog, from a 12-hour cache or GitHub. Never throws.
 // { releases, fresh }: fresh is false when GitHub couldn't be reached and the releases are an old cache (or null).
-export async function fetchLatest({ force = false, url = process.env.WF_UPDATE_URL || CHANGELOG_URL, cacheFile = process.env.WF_UPDATE_CACHE || CACHE } = {}) {
+// Concurrent checks (several tabs, server startup) share one request.
+export function fetchLatest({ force = false, url = process.env.WF_UPDATE_URL || CHANGELOG_URL, cacheFile = process.env.WF_UPDATE_CACHE || CACHE } = {}) {
+  const key = `${force}|${url}|${cacheFile}`;
+  if (!inflight.has(key)) inflight.set(key, check({ force, url, cacheFile }).finally(() => inflight.delete(key)));
+  return inflight.get(key);
+}
+
+async function check({ force, url, cacheFile }) {
   let cached = null;
   try { cached = readJSON(cacheFile, null); } catch {} // A broken cache is rewritten by the fetch below.
-  if (!force && cached?.releases && cached.url === url && Date.now() - new Date(cached.checkedAt) < MAX_AGE_MS) return { releases: cached.releases, fresh: true };
+  if (cached?.url !== url) cached = null;
+  const since = (t) => (t ? Date.now() - new Date(t) : Infinity);
+  if (!force && cached?.releases && since(cached.checkedAt) < MAX_AGE_MS) return { releases: cached.releases, fresh: true };
+  if (!force && since(cached?.failedAt) < RETRY_MS) return { releases: cached.releases || null, fresh: false };
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(5000), headers: { 'user-agent': `wf/${VERSION}` } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -60,7 +72,8 @@ export async function fetchLatest({ force = false, url = process.env.WF_UPDATE_U
     try { fs.mkdirSync(path.dirname(cacheFile), { recursive: true }); writeJSON(cacheFile, { url, checkedAt: new Date().toISOString(), releases }); } catch {}
     return { releases, fresh: true };
   } catch {
-    return { releases: cached?.url === url ? cached.releases || null : null, fresh: false };
+    try { fs.mkdirSync(path.dirname(cacheFile), { recursive: true }); writeJSON(cacheFile, { ...cached, url, failedAt: new Date().toISOString() }); } catch {}
+    return { releases: cached?.releases || null, fresh: false };
   }
 }
 
@@ -68,7 +81,7 @@ export async function fetchLatest({ force = false, url = process.env.WF_UPDATE_U
 export async function updateInfo({ config = {}, force = false, current = VERSION } = {}) {
   const changelog = localChangelog();
   const base = { current, latest: null, available: false, news: [], changelog, commands: UPDATE_COMMANDS, checked: false };
-  if (updateCheckDisabled(config)) return base;
+  if (updateCheckDisabled(config)) return { ...base, disabled: true };
   const { releases, fresh } = await fetchLatest({ force });
   if (!releases?.length) return base;
   const latest = releases[0].version;

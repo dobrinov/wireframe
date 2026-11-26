@@ -310,7 +310,7 @@ function cmdStatus(dir) {
   const comments = loadComments(root);
   const by = (s) => comments.filter((c) => c.status === s).length;
   console.log(`Prototype: ${path.basename(root)} (${root})`);
-  console.log(`Server:    ${info ? `running at http://localhost:${info.port}/${info.version && info.version !== VERSION ? ` (version ${info.version}; wf serve restarts it on ${VERSION})` : ''}` : 'not running (wf serve)'}`);
+  console.log(`Server:    ${info ? `running at http://localhost:${info.port}/${compareVersions(info.version || '0.0.0', VERSION) < 0 ? ` (${info.version ? `version ${info.version}` : 'an older version'}; wf serve restarts it on ${VERSION})` : ''}` : 'not running (wf serve)'}`);
   console.log(`Version:   ${VERSION}`);
   console.log(`Users:     ${loadUsers(root).length}`);
   console.log(`Comments:  ${by('open')} open · ${by('queued')} waiting for agent · ${by('working')} with agent · ${by('resolved')} resolved`);

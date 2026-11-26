@@ -1,6 +1,6 @@
 {
   "name": "wireframe",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "/sketch: turn a one-line brief into a working LoFi prototype with seeded test users, a user switcher and on-screen comments that go straight back to Claude Code.",
   "author": { "name": "Deyan Dobrinov" },
   "license": "MIT",
