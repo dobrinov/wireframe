@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import {
   KIT_ROOT, DEFAULT_HOME, paths, findProject, requireProject, loadUsers, loadComments, updateComment,
   pending, formatForAgent, runningServer, viaServer, readJSON, isProject,
@@ -110,9 +110,12 @@ async function cmdServe(dir, flags) {
   let running = runningServer(root);
   // A server left running from an older version keeps serving the old harness: replace it on the same port.
   if (running && !flags.force && compareVersions(running.version || '0.0.0', VERSION) < 0) {
-    console.log(`Restarting the prototype server (it was running ${running.version ? `version ${running.version}` : 'an older version'}, this is ${VERSION}).`);
-    await stopServer(running);
-    flags.port = flags.port || running.port;
+    // server.json may be stale, its pid reused by another process: only stop what really is this prototype's server.
+    if (await isOurServer(running, root)) {
+      console.log(`Restarting the prototype server (it was running ${running.version ? `version ${running.version}` : 'an older version'}, this is ${VERSION}).`);
+      await stopServer(running);
+      flags.port = flags.port || running.port;
+    }
     running = null;
   }
   if (running && !flags.force) {
@@ -198,24 +201,40 @@ async function cmdWatch(dir, flags) {
   if (process.env.CLAUDE_CODE_SESSION_ID) q.set('session', process.env.CLAUDE_CODE_SESSION_ID.slice(0, 8));
   if (process.env.CLAUDECODE || process.env.CLAUDE_CODE_ENTRYPOINT) q.set('client', 'claude-code');
   if (process.env.TERM_PROGRAM) q.set('term', process.env.TERM_PROGRAM.replace(/\.app$/, ''));
-  const res = await fetch(`http://127.0.0.1:${info.port}/_wf/api/agent/stream?${q}`, { headers: { origin: `http://localhost:${info.port}` } });
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buf = '';
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) { console.log('Prototype server stopped.'); return; }
-    buf += decoder.decode(value, { stream: true });
-    let i;
-    while ((i = buf.indexOf('\n\n')) >= 0) {
-      const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
-      const ev = /^event: (.*)$/m.exec(chunk)?.[1];
-      const data = /^data: (.*)$/m.exec(chunk)?.[1];
-      if (ev === 'items' && data) {
-        print(JSON.parse(data));
-        if (once) { reader.cancel().catch(() => {}); process.exit(0); }
+  // Returns when the stream ends; true if it connected first.
+  const listen = async (port) => {
+    let res;
+    try { res = await fetch(`http://127.0.0.1:${port}/_wf/api/agent/stream?${q}`, { headers: { origin: `http://localhost:${port}` } }); } catch { return false; }
+    if (!res.ok || !res.body) return false;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    for (;;) {
+      let chunk;
+      try { chunk = await reader.read(); } catch { return true; }
+      if (chunk.done) return true;
+      buf += decoder.decode(chunk.value, { stream: true });
+      let i;
+      while ((i = buf.indexOf('\n\n')) >= 0) {
+        const part = buf.slice(0, i); buf = buf.slice(i + 2);
+        const ev = /^event: (.*)$/m.exec(part)?.[1];
+        const data = /^data: (.*)$/m.exec(part)?.[1];
+        if (ev === 'items' && data) {
+          print(JSON.parse(data));
+          if (once) { reader.cancel().catch(() => {}); process.exit(0); }
+        }
       }
     }
+  };
+  // When the server restarts (wf serve on a newer version), keep listening on the new one.
+  const GRACE_MS = 10000;
+  let port = info.port;
+  let lostAt = Date.now();
+  for (;;) {
+    if (await listen(port)) lostAt = Date.now();
+    if (Date.now() - lostAt > GRACE_MS) { console.log('Prototype server stopped.'); return; }
+    await new Promise((r) => setTimeout(r, 500));
+    port = runningServer(root)?.port ?? port;
   }
 }
 
@@ -382,12 +401,29 @@ function cmdSetup(flags) {
 export { isProject };
 
 // ---- versions ----
+// True when the server at info.port answers as the wf server for this prototype.
+async function isOurServer(info, root) {
+  try {
+    const res = await fetch(`http://127.0.0.1:${info.port}/_wf/api/project`, { signal: AbortSignal.timeout(2000) });
+    if (!res.ok) return false;
+    const body = await res.json();
+    return !!body.root && path.resolve(body.root) === path.resolve(root);
+  } catch { return false; }
+}
+
 async function stopServer(info) {
   try { process.kill(info.pid, 'SIGTERM'); } catch { return; }
-  for (let i = 0; i < 50; i++) {
-    try { process.kill(info.pid, 0); } catch { return; }
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  const gone = async (tries) => {
+    for (let i = 0; i < tries; i++) {
+      try { process.kill(info.pid, 0); } catch { return true; }
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    return false;
+  };
+  if (await gone(50)) return;
+  // Still there after 5 s: force it, so it can't hold the port or outlive the new server.
+  try { process.kill(info.pid, 'SIGKILL'); } catch { return; }
+  if (!(await gone(20))) throw new Error(`The old prototype server (pid ${info.pid}) won't stop. Stop it, then run wf serve again.`);
 }
 
 const plain = (s) => String(s).replace(/\*\*(.+?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1');
@@ -408,7 +444,7 @@ function cmdChangelog(flags) {
 async function cmdUpdate(flags) {
   const u = await updateInfo({ force: true });
   if (flags.json) return console.log(JSON.stringify(u, null, 2));
-  if (!u.checked) {
+  if (!u.checked && !u.available) {
     console.log(`You have Wireframe ${VERSION}. Couldn't reach GitHub to check for a newer version${process.env.WF_NO_UPDATE_CHECK || process.env.CI ? ' (update checks are turned off by WF_NO_UPDATE_CHECK or CI)' : ''}.`);
     process.exitCode = 1;
     return;
@@ -424,7 +460,9 @@ async function cmdUpdate(flags) {
   for (const cmd of UPDATE_COMMANDS) {
     console.log(`$ ${cmd}`);
     const [bin, ...args] = cmd.split(' ');
-    try { execFileSync(bin === 'claude' ? claude : bin, args, { stdio: 'inherit' }); } catch (err) {
+    // On Windows `claude` is usually a .cmd shim, which only runs through the shell (the commands are fixed strings).
+    const run = () => process.platform === 'win32' ? execSync(cmd, { stdio: 'inherit' }) : execFileSync(bin === 'claude' ? claude : bin, args, { stdio: 'inherit' });
+    try { run(); } catch (err) {
       console.log(`\nThat step failed (${err.message.split('\n')[0]}). In Claude Code, type /plugin, open Installed → wireframe and choose Update.`);
       process.exitCode = 1;
       return;

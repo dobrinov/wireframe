@@ -6,7 +6,7 @@ import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import {
   KIT_ROOT, paths, loadUsers, loadSeed, loadComments, addComment, updateComment, deleteComment,
-  pending, formatForAgent, writeJSON, loadConfig, saveAttachment, attachmentPath, MAX_IMAGE_BYTES,
+  pending, formatForAgent, readJSON, writeJSON, loadConfig, saveAttachment, attachmentPath, MAX_IMAGE_BYTES,
 } from './project.js';
 import { VERSION, updateInfo } from './update.js';
 
@@ -290,12 +290,14 @@ export async function serve({ root, port = 4321, open = false, library = false, 
   if (root) log('  Comments sent to the agent arrive via: wf watch\n');
   if (open) openBrowser(url);
   // Say so in the terminal too when a newer version is out (the browser shows a banner).
-  updateInfo({ config: root ? loadConfig(root) : {} }).then((u) => {
+  // Runs inside the promise so a broken config.json can't stop the server from starting.
+  Promise.resolve().then(() => updateInfo({ config: root ? loadConfig(root) : {} })).then((u) => {
     if (u.available) log(`  ★ Wireframe ${u.latest} is available (you have ${u.current}). In Claude Code, type: /sketch update\n`);
   }).catch(() => {});
 
   const stop = () => {
-    if (root) { try { fs.rmSync(p.server, { force: true }); } catch {} }
+    // Only remove server.json while it is ours: a newer server may already have taken over.
+    if (root) { try { if (readJSON(p.server, null)?.pid === process.pid) fs.rmSync(p.server, { force: true }); } catch {} }
     process.exit(0);
   };
   process.on('SIGINT', stop);

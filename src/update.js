@@ -46,19 +46,21 @@ export function updateCheckDisabled(config = {}) {
   return config.updateCheck === false || !!process.env.WF_NO_UPDATE_CHECK || !!process.env.CI;
 }
 
-// The newest published changelog, from a 12-hour cache or GitHub. Never throws; null when unknown.
+// The newest published changelog, from a 12-hour cache or GitHub. Never throws.
+// { releases, fresh }: fresh is false when GitHub couldn't be reached and the releases are an old cache (or null).
 export async function fetchLatest({ force = false, url = process.env.WF_UPDATE_URL || CHANGELOG_URL, cacheFile = process.env.WF_UPDATE_CACHE || CACHE } = {}) {
-  const cached = readJSON(cacheFile, null);
-  if (!force && cached?.releases && cached.url === url && Date.now() - new Date(cached.checkedAt) < MAX_AGE_MS) return cached.releases;
+  let cached = null;
+  try { cached = readJSON(cacheFile, null); } catch {} // A broken cache is rewritten by the fetch below.
+  if (!force && cached?.releases && cached.url === url && Date.now() - new Date(cached.checkedAt) < MAX_AGE_MS) return { releases: cached.releases, fresh: true };
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(5000), headers: { 'user-agent': `wf/${VERSION}` } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const releases = parseChangelog(await res.text());
     if (!releases.length) throw new Error('no releases in the changelog');
     try { fs.mkdirSync(path.dirname(cacheFile), { recursive: true }); writeJSON(cacheFile, { url, checkedAt: new Date().toISOString(), releases }); } catch {}
-    return releases;
+    return { releases, fresh: true };
   } catch {
-    return cached?.releases || null;
+    return { releases: cached?.url === url ? cached.releases || null : null, fresh: false };
   }
 }
 
@@ -67,9 +69,10 @@ export async function updateInfo({ config = {}, force = false, current = VERSION
   const changelog = localChangelog();
   const base = { current, latest: null, available: false, news: [], changelog, commands: UPDATE_COMMANDS, checked: false };
   if (updateCheckDisabled(config)) return base;
-  const releases = await fetchLatest({ force });
+  const { releases, fresh } = await fetchLatest({ force });
   if (!releases?.length) return base;
   const latest = releases[0].version;
   const news = releases.filter((r) => compareVersions(r.version, current) > 0);
-  return { ...base, latest, available: news.length > 0, news, checked: true };
+  // From an old cache, a newer release is still worth showing, but "no update" can't be trusted: checked stays false.
+  return { ...base, latest, available: news.length > 0, news, checked: fresh };
 }

@@ -10,7 +10,7 @@ You build clickable, **LoFi** prototypes with the `wf` library and keep improvin
 ## 0. Find the `wf` helper
 
 This skill lives in a plugin. Its root is two folders up from this skill's base directory (`<base>/../..`); call it `KIT`.
-- If `wf` is on PATH, use `wf`. If `wf version` differs from the `version` in `KIT/package.json`, the `wf` command still points at an older copy of the plugin: run `node "KIT/bin/wf.js" setup` quietly to repoint it, then carry on.
+- If `wf` is on PATH, use `wf`. If `wf version` is **older** than the `version` in `KIT/package.json`, the `wf` command still points at an older copy of the plugin: run `node "KIT/bin/wf.js" setup` quietly to repoint it, then carry on. If it is newer, leave it alone: this session is running an old copy of the skill, and the newer `wf` works with it.
 - Otherwise use `node "KIT/bin/wf.js"`, and offer to run `node "KIT/bin/wf.js" setup` so `wf` works everywhere.
 - If `node` is missing (or older than 18), go to **Setup**.
 
