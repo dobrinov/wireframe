@@ -119,3 +119,50 @@ test('prototypes inside a code repository: gitignored runtime, found from the re
   execFileSync(process.execPath, [WF, 'new', 'onboarding', '--dir', path.join(repo, 'wireframes')], { stdio: 'pipe' });
   assert.throws(() => run('status'), /several prototypes/);
 });
+
+// ---- versions, changelog and update checks ----
+import http from 'node:http';
+import { parseChangelog, compareVersions, updateInfo, VERSION, localChangelog } from '../src/update.js';
+
+test('package.json, plugin.json and the newest CHANGELOG entry agree on the version', () => {
+  const plugin = JSON.parse(fs.readFileSync('.claude-plugin/plugin.json', 'utf8'));
+  assert.equal(plugin.version, VERSION, 'bump .claude-plugin/plugin.json with package.json');
+  const top = localChangelog()[0];
+  assert.ok(top, 'CHANGELOG.md has no releases');
+  assert.equal(top.version, VERSION, 'add a CHANGELOG.md section for the new version');
+  assert.ok(top.changes.length, 'the newest CHANGELOG.md section lists no changes');
+});
+
+test('parseChangelog reads releases, dates, bullets and wrapped lines, newest first', () => {
+  const md = `# Changelog\n\nIntro with - not a bullet\n\n## 0.9.0 · 2026-01-02\n\n- **One.** first\n  continued\n- Two\n\n## 0.10.0 - 2026-02-03\n- Ten\n\n## [1.0.0]\n- Big\n`;
+  const r = parseChangelog(md);
+  assert.deepEqual(r.map((x) => x.version), ['1.0.0', '0.10.0', '0.9.0']);
+  assert.equal(r[2].date, '2026-01-02');
+  assert.equal(r[0].date, null);
+  assert.deepEqual(r[2].changes, ['**One.** first continued', 'Two']);
+  assert.equal(compareVersions('0.10.0', '0.9.9'), 1);
+  assert.equal(compareVersions('1.2.3', '1.2.3'), 0);
+  assert.equal(compareVersions('0.1.0', '0.2.0'), -1);
+});
+
+test('updateInfo reports newer releases from the published changelog and caches them', async () => {
+  let hits = 0;
+  const srv = http.createServer((req, res) => { hits++; res.end('## 9.1.0 · 2030-01-01\n- Newest\n## 9.0.0\n- Newer\n## 0.0.1\n- Old\n'); });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const env = { url: process.env.WF_UPDATE_URL, cache: process.env.WF_UPDATE_CACHE, ci: process.env.CI };
+  process.env.WF_UPDATE_URL = `http://127.0.0.1:${srv.address().port}/CHANGELOG.md`;
+  process.env.WF_UPDATE_CACHE = path.join(tmp(), 'update-check.json');
+  delete process.env.CI;
+  try {
+    const u = await updateInfo({ current: '1.0.0' });
+    assert.equal(u.available, true);
+    assert.equal(u.latest, '9.1.0');
+    assert.deepEqual(u.news.map((r) => r.version), ['9.1.0', '9.0.0']);
+    assert.equal((await updateInfo({ current: '9.1.0' })).available, false);
+    assert.equal(hits, 1, 'second check should come from the cache');
+    assert.equal((await updateInfo({ current: '1.0.0', config: { updateCheck: false } })).checked, false);
+  } finally {
+    srv.close();
+    for (const [k, v] of [['WF_UPDATE_URL', env.url], ['WF_UPDATE_CACHE', env.cache], ['CI', env.ci]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  }
+});

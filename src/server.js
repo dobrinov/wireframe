@@ -8,6 +8,7 @@ import {
   KIT_ROOT, paths, loadUsers, loadSeed, loadComments, addComment, updateComment, deleteComment,
   pending, formatForAgent, writeJSON, loadConfig, saveAttachment, attachmentPath, MAX_IMAGE_BYTES,
 } from './project.js';
+import { VERSION, updateInfo } from './update.js';
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -201,6 +202,7 @@ export async function serve({ root, port = 4321, open = false, library = false, 
       if (route === '/_wf/api/events') {
         sse(res);
         browsers.add(res);
+        res.write(`event: hello\ndata: ${JSON.stringify({ version: VERSION })}\n\n`);
         res.write(`event: agent\ndata: ${JSON.stringify(agentState())}\n\n`);
         req.on('close', () => browsers.delete(res));
         return;
@@ -220,7 +222,10 @@ export async function serve({ root, port = 4321, open = false, library = false, 
         return;
       }
       if (route === '/_wf/api/project') {
-        return json(res, 200, root ? { name: path.basename(root), root, library } : { name: 'wf library', library: true });
+        return json(res, 200, root ? { name: path.basename(root), root, library, version: VERSION } : { name: 'wf library', library: true, version: VERSION });
+      }
+      if (route === '/_wf/api/update') {
+        return json(res, 200, await updateInfo({ config: root ? loadConfig(root) : {}, force: url.searchParams.has('force') }));
       }
       if (route === '/_wf/api/users') return json(res, 200, root ? loadUsers(root) : []);
       if (route.startsWith('/_wf/api/seed/')) {
@@ -279,11 +284,15 @@ export async function serve({ root, port = 4321, open = false, library = false, 
   });
 
   const actualPort = await listen(server, port);
-  if (root) writeJSON(p.server, { port: actualPort, pid: process.pid, startedAt: new Date().toISOString() });
+  if (root) writeJSON(p.server, { port: actualPort, pid: process.pid, version: VERSION, startedAt: new Date().toISOString() });
   const url = `http://localhost:${actualPort}${library ? '/_wf/library' : '/'}`;
   log(`\n  wf ${library ? 'library' : `· ${path.basename(root)}`}\n  ➜ ${url}\n`);
   if (root) log('  Comments sent to the agent arrive via: wf watch\n');
   if (open) openBrowser(url);
+  // Say so in the terminal too when a newer version is out (the browser shows a banner).
+  updateInfo({ config: root ? loadConfig(root) : {} }).then((u) => {
+    if (u.available) log(`  ★ Wireframe ${u.latest} is available (you have ${u.current}). In Claude Code, type: /sketch update\n`);
+  }).catch(() => {});
 
   const stop = () => {
     if (root) { try { fs.rmSync(p.server, { force: true }); } catch {} }

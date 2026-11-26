@@ -10,7 +10,7 @@ You build clickable, **LoFi** prototypes with the `wf` library and keep improvin
 ## 0. Find the `wf` helper
 
 This skill lives in a plugin. Its root is two folders up from this skill's base directory (`<base>/../..`); call it `KIT`.
-- If `wf` is on PATH, use `wf`.
+- If `wf` is on PATH, use `wf`. If `wf version` differs from the `version` in `KIT/package.json`, the `wf` command still points at an older copy of the plugin: run `node "KIT/bin/wf.js" setup` quietly to repoint it, then carry on.
 - Otherwise use `node "KIT/bin/wf.js"`, and offer to run `node "KIT/bin/wf.js" setup` so `wf` works everywhere.
 - If `node` is missing (or older than 18), go to **Setup**.
 
@@ -23,6 +23,8 @@ Read the arguments after `/sketch`:
 | Arguments | Do |
 |---|---|
 | `setup`, `doctor`, or something is broken | **Setup** |
+| `update`, "upgrade", or "is there a new version" | **Update** (section 2b) |
+| `changelog` / "what's new" | Run `wf changelog` and summarise it in plain words |
 | a description of something to build, inside a code repository that is not itself a prototype | **Existing project** (section 3b), then **New prototype** |
 | a description of something to build, anywhere else | **New prototype** |
 | nothing, or a change request, inside a prototype folder (has `seed/users.json`) | **Iterate** |
@@ -45,6 +47,17 @@ A code repository means the nearest folder above with `.git`, holding app code. 
    - `claude` → cannot be missing while you run; ignore.
 3. **No Node.js** → explain: "The prototypes need a small runtime (about 50 MB). I'll install a private copy just for this tool. It won't change anything else on your computer." Then run `sh KIT/install/bootstrap.sh` on Mac/Linux or `powershell -ExecutionPolicy Bypass -File KIT/install/bootstrap.ps1` on Windows. It downloads Node into `~/.wireframe/runtime`, then runs `wf setup`.
 4. Re-run `wf doctor` and confirm in one line: "All set. Tell me what you'd like to sketch."
+
+## 2b. Update
+
+Prototypes show a banner when a new version is out, telling people to type `/sketch update`.
+
+1. Run `wf update`. It checks GitHub, prints what changed, and runs `claude plugin marketplace update dobrinov` and `claude plugin update wireframe@dobrinov`.
+2. If it says Wireframe is already the latest, say so in one line. If it could not reach GitHub, say that and stop.
+3. If a step fails, tell the person to type `/plugin`, open **Installed → wireframe** and choose **Update**.
+4. After it updates, summarise the new version's changes in two or three plain lines, then say: "Restart Claude Code (quit and open it again) so the new version loads. Your prototypes switch over the next time you open them with /sketch."
+
+You keep running the old version until the restart, so don't start building with it after an update. Running prototype servers from an older version are replaced automatically by `wf serve`, and open browser tabs reload by themselves.
 
 ## 3. New prototype
 

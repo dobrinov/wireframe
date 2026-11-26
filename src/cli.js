@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { execFileSync } from 'node:child_process';
 import {
   KIT_ROOT, DEFAULT_HOME, paths, findProject, requireProject, loadUsers, loadComments, updateComment,
   pending, formatForAgent, runningServer, viaServer, readJSON, isProject,
@@ -8,6 +9,7 @@ import {
 } from './project.js';
 import { serve, which, openBrowser } from './server.js';
 import { lint } from './lint.js';
+import { VERSION, updateInfo, compareVersions, localChangelog, UPDATE_COMMANDS } from './update.js';
 
 const HELP = `wf — agentic LoFi wireframing helper
 
@@ -31,6 +33,9 @@ Info
   wf users                 Show the seeded users of this prototype
   wf status                Is the prototype running? What is waiting?
   wf docs [style|components|patterns|personas]   Print the reference docs
+  wf version               Print the installed version
+  wf changelog [--all]     What changed in this version (--all: every version)
+  wf update [--check]      Check for a newer version and install it (--check: only check)
 `;
 
 export async function main(argv) {
@@ -38,7 +43,9 @@ export async function main(argv) {
   const cmd = args.shift() || 'help';
   switch (cmd) {
     case 'help': case '--help': case '-h': return console.log(HELP);
-    case 'version': case '--version': return console.log(readJSON(path.join(KIT_ROOT, 'package.json')).version);
+    case 'version': case '--version': case '-v': return console.log(VERSION);
+    case 'changelog': case 'news': return cmdChangelog(flags);
+    case 'update': case 'upgrade': return cmdUpdate(flags);
     case 'new': return cmdNew(args[0], flags);
     case 'list': case 'ls': return cmdList(flags);
     case 'serve': case 'open': case 'start': return cmdServe(args[0], flags);
@@ -100,7 +107,14 @@ function copyTemplate(from, to, vars) {
 // ---- serve ----
 async function cmdServe(dir, flags) {
   const root = resolveProject(dir);
-  const running = runningServer(root);
+  let running = runningServer(root);
+  // A server left running from an older version keeps serving the old harness: replace it on the same port.
+  if (running && !flags.force && compareVersions(running.version || '0.0.0', VERSION) < 0) {
+    console.log(`Restarting the prototype server (it was running ${running.version ? `version ${running.version}` : 'an older version'}, this is ${VERSION}).`);
+    await stopServer(running);
+    flags.port = flags.port || running.port;
+    running = null;
+  }
   if (running && !flags.force) {
     const url = `http://localhost:${running.port}/`;
     console.log(`Already running: ${url}`);
@@ -270,7 +284,8 @@ function cmdStatus(dir) {
   const comments = loadComments(root);
   const by = (s) => comments.filter((c) => c.status === s).length;
   console.log(`Prototype: ${path.basename(root)} (${root})`);
-  console.log(`Server:    ${info ? `running at http://localhost:${info.port}/` : 'not running (wf serve)'}`);
+  console.log(`Server:    ${info ? `running at http://localhost:${info.port}/${info.version && info.version !== VERSION ? ` (version ${info.version}; wf serve restarts it on ${VERSION})` : ''}` : 'not running (wf serve)'}`);
+  console.log(`Version:   ${VERSION}`);
   console.log(`Users:     ${loadUsers(root).length}`);
   console.log(`Comments:  ${by('open')} open · ${by('queued')} waiting for agent · ${by('working')} with agent · ${by('resolved')} resolved`);
 }
@@ -365,3 +380,55 @@ function cmdSetup(flags) {
 }
 
 export { isProject };
+
+// ---- versions ----
+async function stopServer(info) {
+  try { process.kill(info.pid, 'SIGTERM'); } catch { return; }
+  for (let i = 0; i < 50; i++) {
+    try { process.kill(info.pid, 0); } catch { return; }
+    await new Promise((r) => setTimeout(r, 100));
+  }
+}
+
+const plain = (s) => String(s).replace(/\*\*(.+?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1');
+const printRelease = (r) => {
+  console.log(`${r.version}${r.date ? ` · ${r.date}` : ''}`);
+  for (const c of r.changes) console.log(`  - ${plain(c)}`);
+  console.log('');
+};
+
+function cmdChangelog(flags) {
+  const all = localChangelog();
+  const list = flags.all ? all : all.filter((r) => r.version === VERSION);
+  if (flags.json) return console.log(JSON.stringify(list, null, 2));
+  if (!list.length) return console.log(`No changelog entry for ${VERSION}.`);
+  list.forEach(printRelease);
+}
+
+async function cmdUpdate(flags) {
+  const u = await updateInfo({ force: true });
+  if (flags.json) return console.log(JSON.stringify(u, null, 2));
+  if (!u.checked) {
+    console.log(`You have Wireframe ${VERSION}. Couldn't reach GitHub to check for a newer version${process.env.WF_NO_UPDATE_CHECK || process.env.CI ? ' (update checks are turned off by WF_NO_UPDATE_CHECK or CI)' : ''}.`);
+    process.exitCode = 1;
+    return;
+  }
+  if (!u.available) return console.log(`Wireframe ${VERSION} is the latest version.`);
+  console.log(`Wireframe ${u.latest} is available (you have ${VERSION}). What's new:\n`);
+  u.news.forEach(printRelease);
+  const claude = which('claude');
+  if (flags.check || !claude) {
+    console.log(`To update, in Claude Code type: /sketch update\nOr in a terminal:\n${UPDATE_COMMANDS.map((c) => `  ${c}`).join('\n')}`);
+    return;
+  }
+  for (const cmd of UPDATE_COMMANDS) {
+    console.log(`$ ${cmd}`);
+    const [bin, ...args] = cmd.split(' ');
+    try { execFileSync(bin === 'claude' ? claude : bin, args, { stdio: 'inherit' }); } catch (err) {
+      console.log(`\nThat step failed (${err.message.split('\n')[0]}). In Claude Code, type /plugin, open Installed → wireframe and choose Update.`);
+      process.exitCode = 1;
+      return;
+    }
+  }
+  console.log(`\nUpdated to ${u.latest}. Restart Claude Code so /sketch uses the new version.\nRunning prototypes switch over the next time you open them with /sketch (or wf serve).`);
+}

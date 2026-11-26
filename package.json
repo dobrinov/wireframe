@@ -1,6 +1,6 @@
 {
   "name": "wireframe",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Agentic LoFi wireframing: /sketch for Claude Code, a no-build wireframe component library, seeded users and on-UI comments that reach your coding agent.",
   "type": "module",
   "bin": {

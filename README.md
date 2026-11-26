@@ -56,11 +56,20 @@ Claude Code ◀── `wf watch --once` (background) ── prints the comment, 
 ```
 If no session is listening, sent comments wait in `.wireframe/inbox/`. After 20 seconds the server starts a headless `claude -p` run limited to edits and `wf` commands. Turn that off with `{"headless": false}` in `.wireframe/config.json`.
 
+## Updates and changelog
+
+When a new version is out, every prototype shows a banner with what changed and how to update: type `/sketch update` in Claude Code (or run `wf update`). After an update, prototypes show **What's new** once; it is also in the toolbar's **⋯** menu, and `wf changelog` prints it.
+
+The `wf` server checks [`CHANGELOG.md`](CHANGELOG.md) on GitHub's `main` branch at most every 12 hours. It sends nothing about you or your prototypes. Turn it off with `WF_NO_UPDATE_CHECK=1` or `{"updateCheck": false}` in a prototype's `.wireframe/config.json`.
+
+**Releasing:** add a `## <version> · <date>` section at the top of `CHANGELOG.md`, set the same version in `package.json` and `.claude-plugin/plugin.json` (`npm test` checks they match), and push to `main`. Claude Code only offers an update when the version changes.
+
 ## `wf` commands
 ```
 wf setup | doctor | new <name> [--dir d] | list | serve [dir] [--open] | library
 wf watch [--once] | inbox | reply <id> "<text>" [--resolve] | lint | snapshot [label]
 wf users | status | docs [style|components|patterns|personas]
+wf version | changelog [--all] | update [--check]
 ```
 
 ## Try the example
