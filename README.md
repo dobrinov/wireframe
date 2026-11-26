@@ -62,6 +62,12 @@ When a new version is out, every prototype shows a banner with what changed and 
 
 The `wf` server checks [`CHANGELOG.md`](CHANGELOG.md) on GitHub's `main` branch at most every 12 hours. It sends nothing about you or your prototypes. Turn it off with `WF_NO_UPDATE_CHECK=1` or `{"updateCheck": false}` in a prototype's `.wireframe/config.json`.
 
+## Usage counts
+
+To see how many people use Wireframe and which parts, `wf` sends anonymous events to [Plausible](https://plausible.io): first install, update (from/to version), prototype created, prototype or library opened, and comment sent to the agent. Each carries only the `wf` version, the operating system and the Node.js major version. No IDs, names, paths, prototype contents or comment text. The first time, `wf` prints a one-line notice.
+
+Turn it off with `wf telemetry off`, `WF_NO_TELEMETRY=1` or `DO_NOT_TRACK=1`, or for one prototype with `{"telemetry": false}` in its `.wireframe/config.json`. It is always off in CI. `wf telemetry` shows whether it is on.
+
 **Releasing:** add a `## <version> · <date>` section at the top of `CHANGELOG.md`, set the same version in `package.json` and `.claude-plugin/plugin.json` (`npm test` checks they match), and push to `main`. Claude Code only offers an update when the version changes.
 
 ## `wf` commands
@@ -69,7 +75,7 @@ The `wf` server checks [`CHANGELOG.md`](CHANGELOG.md) on GitHub's `main` branch 
 wf setup | doctor | new <name> [--dir d] | list | serve [dir] [--open] | library
 wf watch [--once] | inbox | reply <id> "<text>" [--resolve] | lint | snapshot [label]
 wf users | status | docs [style|components|patterns|personas]
-wf version | changelog [--all] | update [--check]
+wf version | changelog [--all] | update [--check] | telemetry [on|off]
 ```
 
 ## Try the example

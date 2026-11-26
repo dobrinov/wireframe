@@ -4,6 +4,11 @@ What changed in each version of Wireframe. Prototypes show the entries newer tha
 
 To release: add a `## <version> · <date>` section at the top, set the same version in `package.json` and `.claude-plugin/plugin.json` (the tests check they match), and push to `main`. Claude Code only offers an update when the version number changes. Keep each line short and written for the people using the prototypes.
 
+## 0.3.0 · 2026-11-26
+
+- **Usage counts.** `wf` now sends anonymous counts (installs, updates, prototypes created and opened, comments sent to the agent) with only the version and operating system. Nothing about you or your prototypes. Turn it off with `wf telemetry off`.
+- Restarting a prototype after an update is more reliable, and the agent keeps listening across the restart.
+
 ## 0.2.0 · 2026-11-26
 
 - **Update notices.** When a new version of Wireframe is out, prototypes show a banner with what changed and how to update. Type `/sketch update` in Claude Code to get it.

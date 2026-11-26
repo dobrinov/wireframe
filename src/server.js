@@ -9,6 +9,7 @@ import {
   pending, formatForAgent, readJSON, writeJSON, loadConfig, saveAttachment, attachmentPath, MAX_IMAGE_BYTES,
 } from './project.js';
 import { VERSION, updateInfo } from './update.js';
+import { track } from './telemetry.js';
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -246,6 +247,7 @@ export async function serve({ root, port = 4321, open = false, library = false, 
         log(`  ✎ Comment #${c.id}${c.sendToAgent ? ' → agent' : ''}: ${c.body.slice(0, 70)}`);
         broadcastComments();
         if (c.status === 'queued') scheduleFlush();
+        if (c.sendToAgent) { let config = {}; try { config = loadConfig(root); } catch {} track('comment_sent', {}, { config, log }); }
         return json(res, 201, c);
       }
       if (route === '/_wf/api/attachments' && req.method === 'POST') {

@@ -5,11 +5,12 @@ import { execFileSync, execSync } from 'node:child_process';
 import {
   KIT_ROOT, DEFAULT_HOME, paths, findProject, requireProject, loadUsers, loadComments, updateComment,
   pending, formatForAgent, runningServer, viaServer, readJSON, isProject,
-  findRepo, findProjectsBelow, META_GITIGNORE,
+  findRepo, findProjectsBelow, META_GITIGNORE, loadConfig,
 } from './project.js';
 import { serve, which, openBrowser } from './server.js';
 import { lint } from './lint.js';
 import { VERSION, updateInfo, compareVersions, localChangelog, UPDATE_COMMANDS } from './update.js';
+import { track, setEnabled, disabledReason, NOTICE } from './telemetry.js';
 
 const HELP = `wf — agentic LoFi wireframing helper
 
@@ -36,6 +37,7 @@ Info
   wf version               Print the installed version
   wf changelog [--all]     What changed in this version (--all: every version)
   wf update [--check]      Check for a newer version and install it (--check: only check)
+  wf telemetry [on|off]    Anonymous usage counts: show, turn on or turn off
 `;
 
 export async function main(argv) {
@@ -49,7 +51,7 @@ export async function main(argv) {
     case 'new': return cmdNew(args[0], flags);
     case 'list': case 'ls': return cmdList(flags);
     case 'serve': case 'open': case 'start': return cmdServe(args[0], flags);
-    case 'library': return serve({ root: null, port: Number(flags.port) || 4320, open: !!flags.open, library: true });
+    case 'library': track('serve', { mode: 'library' }); return serve({ root: null, port: Number(flags.port) || 4320, open: !!flags.open, library: true });
     case 'watch': return cmdWatch(args[0], flags);
     case 'inbox': return cmdInbox(args[0], flags);
     case 'reply': return cmdReply(args, flags);
@@ -61,6 +63,7 @@ export async function main(argv) {
     case 'docs': return cmdDocs(args[0]);
     case 'doctor': return cmdDoctor(flags);
     case 'setup': return cmdSetup(flags);
+    case 'telemetry': return cmdTelemetry(args[0]);
     default: throw new Error(`unknown command "${cmd}". Run: wf help`);
   }
 }
@@ -91,6 +94,7 @@ function cmdNew(name, flags) {
   fs.mkdirSync(path.join(dir, '.wireframe', 'inbox'), { recursive: true });
   fs.writeFileSync(path.join(dir, '.wireframe', '.gitignore'), META_GITIGNORE);
   console.log(`Created ${dir}\nNext: wf serve "${dir}" --open`);
+  track('prototype_created');
   if (flags.json) console.log(JSON.stringify({ dir }));
 }
 
@@ -124,6 +128,9 @@ async function cmdServe(dir, flags) {
     if (flags.open) openBrowser(url);
     return;
   }
+  let config = {};
+  try { config = loadConfig(root); } catch {}
+  track('serve', { mode: 'prototype' }, { config });
   await serve({ root, port: Number(flags.port) || 4321, open: !!flags.open });
 }
 
@@ -396,6 +403,14 @@ function cmdSetup(flags) {
   for (const s of steps) console.log('✓ ' + s);
   console.log('');
   cmdDoctor(flags);
+  track(null);
+}
+
+function cmdTelemetry(arg) {
+  if (arg === 'off' || arg === 'on') setEnabled(arg === 'on');
+  else if (arg) throw new Error('use: wf telemetry [on|off]');
+  const why = disabledReason();
+  console.log(why ? `Usage counts are off (${why}).` : `Usage counts are on. ${NOTICE}`);
 }
 
 export { isProject };

@@ -166,3 +166,50 @@ test('updateInfo reports newer releases from the published changelog and caches 
     for (const [k, v] of [['WF_UPDATE_URL', env.url], ['WF_UPDATE_CACHE', env.cache], ['CI', env.ci]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
   }
 });
+
+test('telemetry: install once, update on version change, nothing when off', async () => {
+  const { track } = await import('../src/telemetry.js');
+  const { VERSION } = await import('../src/update.js');
+  const got = [];
+  const srv = http.createServer((req, res) => { let b = ''; req.on('data', (c) => (b += c)); req.on('end', () => { got.push({ ...JSON.parse(b), ua: req.headers['user-agent'] }); res.end('ok'); }); });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const keys = ['WF_TELEMETRY_URL', 'WF_TELEMETRY_STATE', 'CI', 'DO_NOT_TRACK', 'WF_NO_TELEMETRY'];
+  const saved = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
+  process.env.WF_TELEMETRY_URL = `http://127.0.0.1:${srv.address().port}/api/event`;
+  process.env.WF_TELEMETRY_STATE = path.join(tmp(), 'telemetry.json');
+  for (const k of ['CI', 'DO_NOT_TRACK', 'WF_NO_TELEMETRY']) delete process.env[k];
+  const notices = [];
+  const log = (s) => notices.push(s);
+  try {
+    await track('serve', { mode: 'prototype' }, { log });
+    assert.deepEqual(got.map((e) => e.name).sort(), ['install', 'serve']);
+    assert.equal(notices.length, 1);
+    const serveEvent = got.find((e) => e.name === 'serve');
+    assert.equal(serveEvent.domain, 'dobrinov.github.io/wireframe');
+    assert.equal(serveEvent.props.version, VERSION);
+    assert.equal(serveEvent.props.mode, 'prototype');
+    assert.match(serveEvent.ua, /^Mozilla\/5\.0 .* wf\//);
+
+    got.length = 0;
+    await track('serve', {}, { log });
+    assert.deepEqual(got.map((e) => e.name), ['serve'], 'no second install');
+    assert.equal(notices.length, 1, 'notice only once');
+
+    got.length = 0;
+    fs.writeFileSync(process.env.WF_TELEMETRY_STATE, JSON.stringify({ enabled: true, version: '0.0.1' }));
+    await track(null, {}, { log });
+    assert.deepEqual(got.map((e) => [e.name, e.props.from, e.props.to]), [['update', '0.0.1', VERSION]]);
+
+    got.length = 0;
+    await track('serve', {}, { log, config: { telemetry: false } });
+    process.env.DO_NOT_TRACK = '1';
+    await track('serve', {}, { log });
+    delete process.env.DO_NOT_TRACK;
+    fs.writeFileSync(process.env.WF_TELEMETRY_STATE, JSON.stringify({ enabled: false, version: VERSION }));
+    await track('serve', {}, { log });
+    assert.equal(got.length, 0);
+  } finally {
+    srv.close();
+    for (const k of keys) { if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k]; }
+  }
+});
